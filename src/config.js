@@ -1,0 +1,59 @@
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+
+// Tiny .env loader so the project stays dependency free apart from express.
+function loadEnvFile() {
+  const file = path.join(__dirname, '..', '.env');
+  if (!fs.existsSync(file)) return;
+
+  for (const rawLine of fs.readFileSync(file, 'utf8').split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith('#')) continue;
+
+    const eq = line.indexOf('=');
+    if (eq === -1) continue;
+
+    const key = line.slice(0, eq).trim();
+    let value = line.slice(eq + 1).trim();
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+    if (process.env[key] === undefined) process.env[key] = value;
+  }
+}
+
+loadEnvFile();
+
+const toInt = (value, fallback) => {
+  const n = parseInt(value, 10);
+  return Number.isFinite(n) ? n : fallback;
+};
+
+module.exports = {
+  port: toInt(process.env.PORT, 3001),
+  siteName: process.env.SITE_NAME || 'InstaSaver',
+  siteUrl: (process.env.SITE_URL || 'http://localhost:3001').replace(/\/+$/, ''),
+  sessionId: process.env.IG_SESSIONID || '',
+  csrfToken: process.env.IG_CSRFTOKEN || '',
+  rateLimitPerMinute: toInt(process.env.RATE_LIMIT_PER_MINUTE, 20),
+  cacheTtlMs: toInt(process.env.CACHE_TTL_SECONDS, 900) * 1000,
+
+  // ffmpeg is what turns a reel's MP4 into an MP3. Falls back to whatever is
+  // on PATH.
+  ffmpegPath: process.env.FFMPEG_PATH || 'ffmpeg',
+  audioBitrate: process.env.AUDIO_BITRATE || '192k',
+
+  // Optional yt-dlp fallback.
+  ytdlpPath: process.env.YTDLP_PATH || '',
+  cookiesFile: process.env.IG_COOKIES_FILE || '',
+
+  // Optional third-party resolver (RapidAPI style).
+  providerUrl: process.env.PROVIDER_URL || '',
+  providerKey: process.env.PROVIDER_KEY || '',
+  providerHost: process.env.PROVIDER_HOST || '',
+};
