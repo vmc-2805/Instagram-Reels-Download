@@ -122,11 +122,75 @@ function footer() {
   </footer>`;
 }
 
-function layout({ title, description, active = '', canonical = '/', body, jsonLd = null }) {
+function layout({
+  title,
+  description,
+  active = '',
+  canonical = '/',
+  body,
+  jsonLd = null,
+  robots = 'index, follow',
+  ogImage = '/og-image.png',
+  breadcrumbs = []
+}) {
   const url = `${config.siteUrl}${canonical}`;
-  const structured = jsonLd
-    ? `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`
-    : '';
+  const ogImageUrl = ogImage.startsWith('http') ? ogImage : `${config.siteUrl}${ogImage}`;
+
+  // Breadcrumbs JSON-LD Schema
+  let breadcrumbListSchema = null;
+  if (breadcrumbs && breadcrumbs.length > 0) {
+    breadcrumbListSchema = {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      'itemListElement': breadcrumbs.map((crumb, index) => ({
+        '@type': 'ListItem',
+        'position': index + 1,
+        'name': crumb.name,
+        'item': crumb.item ? `${config.siteUrl}${crumb.item}` : undefined
+      }))
+    };
+  }
+
+  // Compile all schemas
+  let schemas = [];
+  if (jsonLd) {
+    if (Array.isArray(jsonLd)) {
+      schemas.push(...jsonLd);
+    } else {
+      schemas.push(jsonLd);
+    }
+  }
+  if (breadcrumbListSchema) {
+    schemas.push(breadcrumbListSchema);
+  }
+
+  const structured = schemas.map(schema =>
+    `<script type="application/ld+json">${JSON.stringify(schema)}</script>`
+  ).join('\n');
+
+  // Breadcrumbs Visual HTML
+  let breadcrumbsHtml = '';
+  if (breadcrumbs && breadcrumbs.length > 0) {
+    const items = breadcrumbs.map((crumb, idx) => {
+      const isLast = idx === breadcrumbs.length - 1;
+      const label = crumb.name;
+      const href = crumb.item;
+      const key = crumb.key || `seo.bread.${label.toLowerCase().replace(/\s+/g, '_')}`;
+      if (isLast || !href) {
+        return `<span class="breadcrumbs-current" data-i18n="${key}">${escapeHtml(label)}</span>`;
+      }
+      return `<a href="${href}" class="breadcrumbs-link" data-i18n="${key}">${escapeHtml(label)}</a>`;
+    }).join(' <span class="breadcrumbs-separator" aria-hidden="true">&rsaquo;</span> ');
+
+    breadcrumbsHtml = `
+  <nav class="breadcrumbs-nav" aria-label="Breadcrumb">
+    <div class="container">
+      <div class="breadcrumbs">
+        ${items}
+      </div>
+    </div>
+  </nav>`;
+  }
 
   return `<!doctype html>
 <html lang="en">
@@ -135,13 +199,16 @@ function layout({ title, description, active = '', canonical = '/', body, jsonLd
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title data-i18n-title="${escapeHtml(title)}">${escapeHtml(title)}</title>
 <meta name="description" content="${escapeHtml(description)}">
+<meta name="robots" content="${escapeHtml(robots)}">
 <link rel="canonical" href="${escapeHtml(url)}">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="${escapeHtml(config.siteName)}">
 <meta property="og:title" content="${escapeHtml(title)}">
 <meta property="og:description" content="${escapeHtml(description)}">
+<meta property="og:image" content="${escapeHtml(ogImageUrl)}">
 <meta property="og:url" content="${escapeHtml(url)}">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="${escapeHtml(ogImageUrl)}">
 <meta name="theme-color" content="#fafafe">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -160,6 +227,7 @@ ${structured}
 <canvas class="mesh-canvas" id="mesh-canvas" aria-hidden="true"></canvas>
 ${header(active)}
 <main id="main">
+${breadcrumbsHtml}
 ${body}
 </main>
 ${footer()}

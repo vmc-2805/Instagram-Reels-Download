@@ -1,6 +1,7 @@
 'use strict';
 
 const config = require('../config');
+const seo = require('../seo');
 const { layout, escapeHtml } = require('./layout');
 
 /* ------------------------------------------------------------------ *
@@ -245,21 +246,31 @@ function toolPage({
   ${toolsSection(route)}
   ${faqSection(faq, faqPrefix)}`;
 
+  const routeSeo = seo[route] || {};
+  const canonicalUrl = `${config.siteUrl}${route}`;
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faq.map((item) => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: { '@type': 'Answer', text: item.a.replace(/<[^>]+>/g, '') },
+    })),
+  };
+
+  const routeSchemas = routeSeo.schema ? routeSeo.schema(canonicalUrl) : [];
+  const mergedSchemas = [faqSchema, ...routeSchemas];
+
   return layout({
-    title,
-    description,
+    title: routeSeo.title || title,
+    description: routeSeo.description || description,
     active: route,
     canonical: route,
     body,
-    jsonLd: {
-      '@context': 'https://schema.org',
-      '@type': 'FAQPage',
-      mainEntity: faq.map((item) => ({
-        '@type': 'Question',
-        name: item.q,
-        acceptedAnswer: { '@type': 'Answer', text: item.a.replace(/<[^>]+>/g, '') },
-      })),
-    },
+    jsonLd: mergedSchemas,
+    robots: routeSeo.robots,
+    ogImage: routeSeo.ogImage,
+    breadcrumbs: routeSeo.breadcrumbs
   });
 }
 
@@ -501,12 +512,20 @@ const PAGE_ICONS = {
   terms: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/>',
 };
 
-const staticPage = (route, titleKey, descKey, body, sidebarItems) =>
-  layout({
-    title: `${titleKey} | ${config.siteName}`,
-    description: '',
+const staticPage = (route, titleKey, descKey, body, sidebarItems) => {
+  const routeSeo = seo[route] || {};
+  const canonicalUrl = `${config.siteUrl}${route}`;
+  const routeSchemas = routeSeo.schema ? routeSeo.schema(canonicalUrl) : [];
+
+  return layout({
+    title: routeSeo.title || `${titleKey} | ${config.siteName}`,
+    description: routeSeo.description || '',
     active: route,
     canonical: route,
+    robots: routeSeo.robots,
+    ogImage: routeSeo.ogImage,
+    breadcrumbs: routeSeo.breadcrumbs,
+    jsonLd: routeSchemas,
     body: `
     <section class="static-hero">
       <div class="static-hero-bg" aria-hidden="true"></div>
@@ -528,6 +547,7 @@ const staticPage = (route, titleKey, descKey, body, sidebarItems) =>
       </div>
     </section>`,
   });
+};
 
 const about = () =>
   staticPage(
@@ -560,12 +580,20 @@ const about = () =>
     ]
   );
 
-const contact = () =>
-  layout({
-    title: `Contact | ${config.siteName}`,
-    description: '',
+const contact = () => {
+  const routeSeo = seo['/contact'] || {};
+  const canonicalUrl = `${config.siteUrl}/contact`;
+  const routeSchemas = routeSeo.schema ? routeSeo.schema(canonicalUrl) : [];
+
+  return layout({
+    title: routeSeo.title || `Contact | ${config.siteName}`,
+    description: routeSeo.description || '',
     active: '/contact',
     canonical: '/contact',
+    robots: routeSeo.robots,
+    ogImage: routeSeo.ogImage,
+    breadcrumbs: routeSeo.breadcrumbs,
+    jsonLd: routeSchemas,
     body: `
     <section class="static-hero">
       <div class="static-hero-bg" aria-hidden="true"></div>
@@ -601,6 +629,7 @@ const contact = () =>
       </div>
     </section>`,
   });
+};
 
 const privacy = () =>
   staticPage(
@@ -680,11 +709,19 @@ const terms = () =>
     ]
   );
 
-const notFound = () =>
-  layout({
-    title: `Page not found | ${config.siteName}`,
-    description: 'That page does not exist.',
+const notFound = () => {
+  const routeSeo = seo['404'] || {};
+  const canonicalUrl = `${config.siteUrl}/404`;
+  const routeSchemas = routeSeo.schema ? routeSeo.schema(canonicalUrl) : [];
+
+  return layout({
+    title: routeSeo.title || `Page not found | ${config.siteName}`,
+    description: routeSeo.description || 'That page does not exist.',
     canonical: '/404',
+    robots: routeSeo.robots || 'noindex, nofollow',
+    ogImage: routeSeo.ogImage,
+    breadcrumbs: routeSeo.breadcrumbs,
+    jsonLd: routeSchemas,
     body: `
     <section class="section error-page">
       <div class="container narrow center">
@@ -695,5 +732,6 @@ const notFound = () =>
       </div>
     </section>`,
   });
+};
 
 module.exports = { home, audio, photo, about, contact, privacy, terms, notFound };

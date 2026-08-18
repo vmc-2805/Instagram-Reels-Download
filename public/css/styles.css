@@ -1735,3 +1735,46 @@ html[data-theme='light'] .icon-moon { display: none; }
   html { scroll-behavior: auto; }
   .reveal { opacity: 1; transform: none; }
 }
+
+/* ==========================================================================
+   Breadcrumbs Component
+   ========================================================================== */
+.breadcrumbs-nav {
+  position: relative;
+  z-index: 10;
+  padding: 16px 0 0;
+  margin-bottom: -8px;
+}
+
+.breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-family: var(--font-body);
+  font-weight: 500;
+  color: var(--text-2);
+}
+
+.breadcrumbs-link {
+  color: var(--text-2);
+  transition: color var(--t-fast);
+}
+
+.breadcrumbs-link:hover {
+  color: var(--brand-1);
+}
+
+.breadcrumbs-separator {
+  color: var(--text-3);
+  font-size: 0.9rem;
+  user-select: none;
+  opacity: 0.6;
+}
+
+.breadcrumbs-current {
+  color: var(--text-0);
+  font-weight: 600;
+}
+
