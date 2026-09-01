@@ -1,0 +1,39 @@
+# InstaSaver
+
+> Free online tool to download Instagram videos, reels, photos, and audio (MP3) in original quality. No sign-in required.
+
+## What It Does
+- Download Instagram videos and reels as MP4 in original quality
+- Extract Instagram reel audio and save as MP3
+- Download Instagram photos and carousels in full resolution JPG
+- Supports public posts, reels, carousels, and feed videos
+
+## How It Works
+1. Copy the Instagram post/reel URL
+2. Paste it on the site
+3. Download the media file directly
+
+## Key Features
+- No account or login required
+- Original quality files from Instagram CDN
+- Works on mobile, tablet, and desktop
+- Free with no download limits
+- Supports carousels (multiple slides)
+- No files stored on servers
+
+## Pages
+- Home (Video Downloader): https://igreelssave.com/
+- Reels Audio to MP3: https://igreelssave.com/audio
+- Photo Downloader: https://igreelssave.com/photo
+- About: https://igreelssave.com/about
+- Contact: https://igreelssave.com/contact
+- Privacy Policy: https://igreelssave.com/privacy
+- Terms of Use: https://igreelssave.com/terms
+
+## Contact
+For bug reports or takedown requests: https://igreelssave.com/contact
+
+## Legal
+- Only downloads public Instagram content
+- Not affiliated with Instagram or Meta Platforms, Inc.
+- Users must respect copyright and only download content they have rights to

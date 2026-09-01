@@ -1,0 +1,21 @@
+{
+  "name": "InstaSaver",
+  "short_name": "InstaSaver",
+  "description": "Free Instagram video, reel, photo and audio downloader. Save Instagram media in original quality.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fafafe",
+  "theme_color": "#fafafe",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

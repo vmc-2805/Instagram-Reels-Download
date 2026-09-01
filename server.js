@@ -48,10 +48,69 @@ app.get('/contact', (req, res) => html(res, pages.contact()));
 app.get('/privacy', (req, res) => html(res, pages.privacy()));
 app.get('/terms', (req, res) => html(res, pages.terms()));
 
+app.get('/llms.txt', (req, res) => {
+  res
+    .type('text/plain')
+    .send(`# InstaSaver
+
+> Free online tool to download Instagram videos, reels, photos, and audio (MP3) in original quality. No sign-in required.
+
+## What It Does
+- Download Instagram videos and reels as MP4 in original quality
+- Extract Instagram reel audio and save as MP3
+- Download Instagram photos and carousels in full resolution JPG
+
+## Pages
+- Home (Video Downloader): ${config.siteUrl}/
+- Reels Audio to MP3: ${config.siteUrl}/audio
+- Photo Downloader: ${config.siteUrl}/photo
+- About: ${config.siteUrl}/about
+- Contact: ${config.siteUrl}/contact
+- Privacy Policy: ${config.siteUrl}/privacy
+- Terms of Use: ${config.siteUrl}/terms
+
+## Contact
+For bug reports or takedown requests: ${config.siteUrl}/contact
+
+## Legal
+- Only downloads public Instagram content
+- Not affiliated with Instagram or Meta Platforms, Inc.
+`);
+});
+
 app.get('/robots.txt', (req, res) => {
   res
     .type('text/plain')
-    .send(`User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${config.siteUrl}/sitemap.xml\n`);
+    .send(`User-agent: *
+Allow: /
+Disallow: /api/
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+Sitemap: ${config.siteUrl}/sitemap.xml
+`);
 });
 
 app.get('/sitemap.xml', (req, res) => {

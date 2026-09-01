@@ -38,13 +38,9 @@ function header(active) {
   return `
   <header class="site-header">
     <div class="container header-inner">
-      <a class="brand" href="/">
-        <span class="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 3v11"/><path d="m7 11 5 5 5-5"/><path d="M5 20h14"/>
-          </svg>
-        </span>
-        <span class="brand-name">${escapeHtml(config.siteName)}</span>
+      <a class="brand" href="/" aria-label="${escapeHtml(config.siteName)} — home">
+        <img class="brand-logo brand-logo-dark" src="/logo.png" alt="${escapeHtml(config.siteName)}" loading="eager">
+        <img class="brand-logo brand-logo-light" src="/light-logo.png" alt="${escapeHtml(config.siteName)}" loading="eager">
       </a>
 
       <div class="header-spacer"></div>
@@ -87,13 +83,9 @@ function footer() {
     <div class="container footer-inner">
       <div class="footer-top">
         <div class="footer-brand">
-          <a class="brand" href="/">
-            <span class="brand-mark" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 3v11"/><path d="m7 11 5 5 5-5"/><path d="M5 20h14"/>
-              </svg>
-            </span>
-            <span class="brand-name">${escapeHtml(config.siteName)}</span>
+          <a class="brand" href="/" aria-label="${escapeHtml(config.siteName)} — home">
+            <img class="brand-logo brand-logo-dark" src="/logo.png" alt="${escapeHtml(config.siteName)}" loading="lazy">
+            <img class="brand-logo brand-logo-light" src="/light-logo.png" alt="${escapeHtml(config.siteName)}" loading="lazy">
           </a>
           <p class="footer-desc" data-i18n="footer.desc">Save public Instagram videos, reels and photos in original quality, or pull a reel's audio as MP3. No app, no sign in.</p>
         </div>
@@ -192,25 +184,64 @@ function layout({
   </nav>`;
   }
 
+  const orgSchema = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    'name': config.siteName,
+    'url': config.siteUrl,
+    'logo': `${config.siteUrl}/logo.png`,
+    'sameAs': []
+  });
+
+  const websiteSchema = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    'name': config.siteName,
+    'url': config.siteUrl,
+    'potentialAction': {
+      '@type': 'SearchAction',
+      'target': `${config.siteUrl}/?q={search_term_string}`,
+      'query-input': 'required name=search_term_string'
+    }
+  });
+
   return `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
 <title data-i18n-title="${escapeHtml(title)}">${escapeHtml(title)}</title>
 <meta name="description" content="${escapeHtml(description)}">
+<meta name="author" content="${escapeHtml(config.siteName)}">
+<meta name="keywords" content="instagram downloader, instagram video downloader, instagram reels download, instagram photo download, reels to mp3, instagram saver, download instagram reels, save instagram video, ig downloader, instagram video saver">
 <meta name="robots" content="${escapeHtml(robots)}">
+<meta name="googlebot" content="${escapeHtml(robots)}">
+<meta name="language" content="English">
+<meta name="theme-color" content="#fafafe">
+<meta name="msapplication-TileColor" content="#fafafe">
 <link rel="canonical" href="${escapeHtml(url)}">
+<link rel="alternate" hreflang="en" href="${escapeHtml(url)}">
+<link rel="alternate" hreflang="x-default" href="${escapeHtml(url)}">
+${config.searchConsole ? `<meta name="google-site-verification" content="${escapeHtml(config.searchConsole)}">` : ''}
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/logo.png">
+<link rel="manifest" href="/manifest.json">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="${escapeHtml(config.siteName)}">
 <meta property="og:title" content="${escapeHtml(title)}">
 <meta property="og:description" content="${escapeHtml(description)}">
 <meta property="og:image" content="${escapeHtml(ogImageUrl)}">
+<meta property="og:image:alt" content="${escapeHtml(title)}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta property="og:url" content="${escapeHtml(url)}">
+<meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${escapeHtml(title)}">
+<meta name="twitter:description" content="${escapeHtml(description)}">
 <meta name="twitter:image" content="${escapeHtml(ogImageUrl)}">
-<meta name="theme-color" content="#fafafe">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta name="twitter:image:alt" content="${escapeHtml(title)}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -222,6 +253,17 @@ function layout({
   } catch (e) { document.documentElement.dataset.theme = 'light'; }
 </script>
 ${structured}
+<script type="application/ld+json">${orgSchema}</script>
+<script type="application/ld+json">${websiteSchema}</script>
+${config.googleAnalytics ? `
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=${escapeHtml(config.googleAnalytics)}"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', '${escapeHtml(config.googleAnalytics)}');
+</script>` : ''}
 </head>
 <body>
 <canvas class="mesh-canvas" id="mesh-canvas" aria-hidden="true"></canvas>
