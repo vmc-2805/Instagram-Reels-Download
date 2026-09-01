@@ -44,7 +44,6 @@ app.get('/igtv', (req, res) => res.redirect(301, '/'));
 app.get('/story', (req, res) => res.redirect(301, '/'));
 app.get('/photo', (req, res) => html(res, pages.photo()));
 app.get('/about', (req, res) => html(res, pages.about()));
-app.get('/contact', (req, res) => html(res, pages.contact()));
 app.get('/privacy', (req, res) => html(res, pages.privacy()));
 app.get('/terms', (req, res) => html(res, pages.terms()));
 
@@ -65,12 +64,8 @@ app.get('/llms.txt', (req, res) => {
 - Reels Audio to MP3: ${config.siteUrl}/audio
 - Photo Downloader: ${config.siteUrl}/photo
 - About: ${config.siteUrl}/about
-- Contact: ${config.siteUrl}/contact
 - Privacy Policy: ${config.siteUrl}/privacy
 - Terms of Use: ${config.siteUrl}/terms
-
-## Contact
-For bug reports or takedown requests: ${config.siteUrl}/contact
 
 ## Legal
 - Only downloads public Instagram content
@@ -114,7 +109,7 @@ Sitemap: ${config.siteUrl}/sitemap.xml
 });
 
 app.get('/sitemap.xml', (req, res) => {
-  const routes = ['/', '/audio', '/photo', '/about', '/contact', '/privacy', '/terms'];
+  const routes = ['/', '/audio', '/photo', '/about', '/privacy', '/terms'];
   const urls = routes
     .map(
       (route) =>

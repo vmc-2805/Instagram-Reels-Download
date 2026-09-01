@@ -1296,19 +1296,6 @@ html[data-theme='light'] .icon-moon { display: none; }
   pointer-events: none;
 }
 
-.static-hero-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 56px;
-  height: 56px;
-  margin-bottom: 20px;
-  border-radius: var(--radius-lg);
-  background: var(--brand-gradient);
-  color: #fff;
-  box-shadow: 0 6px 24px rgba(123,91,255,0.3);
-}
-
 .static-hero-title {
   font-family: var(--font-heading);
   font-size: clamp(1.9rem, 4.5vw, 2.8rem);
@@ -1323,6 +1310,38 @@ html[data-theme='light'] .icon-moon { display: none; }
   line-height: 1.7;
   max-width: 480px;
   margin: 0 auto;
+}
+
+.static-breadcrumb {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-family: var(--font-body);
+  font-weight: 500;
+  color: var(--text-2);
+  margin: 0 0 14px;
+}
+
+.static-breadcrumb-link {
+  color: var(--text-2);
+  transition: color var(--t-fast);
+}
+
+.static-breadcrumb-link:hover { color: var(--brand-1); }
+
+.static-breadcrumb-sep {
+  color: var(--text-3);
+  font-size: 0.9rem;
+  user-select: none;
+  opacity: 0.6;
+}
+
+.static-breadcrumb-current {
+  color: var(--text-1);
+  font-weight: 600;
 }
 
 .static-body { padding: 48px 0 64px; }

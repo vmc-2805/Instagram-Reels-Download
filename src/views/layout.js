@@ -100,7 +100,6 @@ function footer() {
           <div class="footer-col">
             <h3 data-i18n="footer.site">Site</h3>
             <a href="/about" data-i18n="footer.about">About</a>
-            <a href="/contact" data-i18n="footer.contact">Contact</a>
             <a href="/privacy" data-i18n="footer.privacy">Privacy policy</a>
             <a href="/terms" data-i18n="footer.terms">Terms of use</a>
           </div>
@@ -123,7 +122,8 @@ function layout({
   jsonLd = null,
   robots = 'index, follow',
   ogImage = '/og-image.png',
-  breadcrumbs = []
+  breadcrumbs = [],
+  renderBreadcrumbNav = true
 }) {
   const url = `${config.siteUrl}${canonical}`;
   const ogImageUrl = ogImage.startsWith('http') ? ogImage : `${config.siteUrl}${ogImage}`;
@@ -162,7 +162,7 @@ function layout({
 
   // Breadcrumbs Visual HTML
   let breadcrumbsHtml = '';
-  if (breadcrumbs && breadcrumbs.length > 0) {
+  if (breadcrumbs && breadcrumbs.length > 0 && renderBreadcrumbNav) {
     const items = breadcrumbs.map((crumb, idx) => {
       const isLast = idx === breadcrumbs.length - 1;
       const label = crumb.name;

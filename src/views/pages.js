@@ -237,6 +237,7 @@ function toolPage({
   i18nPrefix = 'home',
   stepsPrefix = 'steps',
   faqPrefix = 'faq',
+  renderBreadcrumbNav = true,
 }) {
   const body = `
   ${downloaderSection({ eyebrow, heading, subheading, placeholder, note, mode, buttonLabel, i18nPrefix })}
@@ -270,7 +271,8 @@ function toolPage({
     jsonLd: mergedSchemas,
     robots: routeSeo.robots,
     ogImage: routeSeo.ogImage,
-    breadcrumbs: routeSeo.breadcrumbs
+    breadcrumbs: routeSeo.breadcrumbs,
+    renderBreadcrumbNav,
   });
 }
 
@@ -350,6 +352,7 @@ const home = () =>
 const audio = () =>
   toolPage({
     route: '/audio',
+    renderBreadcrumbNav: false,
     mode: 'audio',
     buttonLabel: 'Get MP3',
     title: `Instagram Reels Audio Downloader — reel to MP3 | ${config.siteName}`,
@@ -434,6 +437,7 @@ const audio = () =>
 const photo = () =>
   toolPage({
     route: '/photo',
+    renderBreadcrumbNav: false,
     mode: 'photo',
     buttonLabel: 'Get photo',
     title: `Instagram Photo Downloader — full size JPG | ${config.siteName}`,
@@ -505,17 +509,19 @@ const photo = () =>
 
 /* --- static content pages --- */
 
-const PAGE_ICONS = {
-  about: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
-  contact: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="m22 6-10 7L2 6"/>',
-  privacy: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v6c0 4.4 3 8.3 7 9 4-0.7 7-4.6 7-9V6l-7-3z"/>',
-  terms: '<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/>',
-};
-
 const staticPage = (route, titleKey, descKey, body, sidebarItems) => {
   const routeSeo = seo[route] || {};
   const canonicalUrl = `${config.siteUrl}${route}`;
   const routeSchemas = routeSeo.schema ? routeSeo.schema(canonicalUrl) : [];
+  const crumbs = routeSeo.breadcrumbs || [];
+  const crumbHtml = crumbs.map((crumb, idx) => {
+    const isLast = idx === crumbs.length - 1;
+    const key = crumb.key || `seo.bread.${crumb.name.toLowerCase().replace(/\s+/g, '_')}`;
+    if (isLast || !crumb.item) {
+      return `<span class="static-breadcrumb-current" data-i18n="${key}">${escapeHtml(crumb.name)}</span>`;
+    }
+    return `<a class="static-breadcrumb-link" href="${escapeHtml(crumb.item)}" data-i18n="${key}">${escapeHtml(crumb.name)}</a>`;
+  }).join('<span class="static-breadcrumb-sep" aria-hidden="true">&rsaquo;</span>');
 
   return layout({
     title: routeSeo.title || `${titleKey} | ${config.siteName}`,
@@ -525,11 +531,13 @@ const staticPage = (route, titleKey, descKey, body, sidebarItems) => {
     robots: routeSeo.robots,
     ogImage: routeSeo.ogImage,
     breadcrumbs: routeSeo.breadcrumbs,
+    renderBreadcrumbNav: false,
     jsonLd: routeSchemas,
     body: `
     <section class="static-hero">
       <div class="static-hero-bg" aria-hidden="true"></div>
       <div class="container narrow center">
+        ${crumbs.length > 0 ? `<nav class="static-breadcrumb" aria-label="Breadcrumb">${crumbHtml}</nav>` : ''}
         <h1 class="static-hero-title reveal reveal-delay-1" data-i18n="${titleKey}">${titleKey}</h1>
         <p class="static-hero-sub reveal reveal-delay-2" data-i18n="${descKey}">${descKey}</p>
       </div>
@@ -579,57 +587,6 @@ const about = () =>
       { id: 'about-who-it-is-for', label: 'Who it is for', key: 'about.who.title' },
     ]
   );
-
-const contact = () => {
-  const routeSeo = seo['/contact'] || {};
-  const canonicalUrl = `${config.siteUrl}/contact`;
-  const routeSchemas = routeSeo.schema ? routeSeo.schema(canonicalUrl) : [];
-
-  return layout({
-    title: routeSeo.title || `Contact | ${config.siteName}`,
-    description: routeSeo.description || '',
-    active: '/contact',
-    canonical: '/contact',
-    robots: routeSeo.robots,
-    ogImage: routeSeo.ogImage,
-    breadcrumbs: routeSeo.breadcrumbs,
-    jsonLd: routeSchemas,
-    body: `
-    <section class="static-hero">
-      <div class="static-hero-bg" aria-hidden="true"></div>
-      <div class="container narrow center">
-        <h1 class="static-hero-title reveal reveal-delay-1" data-i18n="contact.title">Contact</h1>
-        <p class="static-hero-sub reveal reveal-delay-2" data-i18n="contact.desc">Get in touch about a bug, a takedown request or a feature idea.</p>
-      </div>
-    </section>
-    <section class="section static-body">
-      <div class="container narrow">
-        <div class="static-content reveal reveal-delay-3">
-    <div class="static-intro-card">
-      <p data-i18n="contact.intro">Bug reports, takedown requests and feature ideas are all welcome.</p>
-    </div>
-    <div class="static-cards-grid">
-      <div class="static-info-card">
-        <span class="static-info-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span>
-        <h3 data-i18n="contact.report.title">Reporting a problem</h3>
-        <p data-i18n="contact.report.text">If a link fails, include the link itself and roughly when you tried it. Instagram changes its internals often, and a broken link is usually the first sign that something needs updating.</p>
-      </div>
-      <div class="static-info-card">
-        <span class="static-info-icon static-info-icon--warn"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v6c0 4.4 3 8.3 7 9 4-0.7 7-4.6 7-9V6l-7-3z"/></svg></span>
-        <h3 data-i18n="contact.takedown.title">Takedown requests</h3>
-        <p data-i18n="contact.takedown.text">We do not host any Instagram media &mdash; files stream directly from Instagram's own servers and nothing is retained. If your content appears somewhere it should not, the request needs to go to the site actually hosting it, or to Instagram.</p>
-      </div>
-      <div class="static-info-card">
-        <span class="static-info-icon static-info-icon--green"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="m22 6-10 7L2 6"/></svg></span>
-        <h3 data-i18n="contact.email.title">Email</h3>
-        <p data-i18n="contact.email.text">Replace this section with your own address before you deploy the site.</p>
-      </div>
-    </div>
-    </div>
-      </div>
-    </section>`,
-  });
-};
 
 const privacy = () =>
   staticPage(
@@ -734,4 +691,4 @@ const notFound = () => {
   });
 };
 
-module.exports = { home, audio, photo, about, contact, privacy, terms, notFound };
+module.exports = { home, audio, photo, about, privacy, terms, notFound };

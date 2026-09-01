@@ -108,26 +108,6 @@ const seoConfig = {
       }
     ]
   },
-  '/contact': {
-    title: 'Contact InstaSaver — Feedback & Support',
-    description: 'Get in touch with InstaSaver support. Submit bug reports, copyright/takedown notices, or ask questions about downloading Instagram media.',
-    robots: 'index, follow',
-    ogImage: '/og-image.png',
-    breadcrumbs: [
-      { name: 'Home', item: '/', key: 'seo.bread.home' },
-      { name: 'Contact', item: '/contact', key: 'footer.contact' }
-    ],
-    schema: (url) => [
-      {
-        '@context': 'https://schema.org',
-        '@type': 'ContactPage',
-        '@id': `${config.siteUrl}/contact#webpage`,
-        'name': `Contact | ${config.siteName}`,
-        'description': 'Contact InstaSaver for support or copyright notices.',
-        'url': url
-      }
-    ]
-  },
   '/privacy': {
     title: 'Privacy Policy | InstaSaver Instagram Downloader',
     description: 'Read the privacy policy of InstaSaver. Learn how we handle your data, rate limit checks, logs, and respect your privacy.',

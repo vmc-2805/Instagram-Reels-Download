@@ -26,12 +26,8 @@
 - Reels Audio to MP3: https://igreelssave.com/audio
 - Photo Downloader: https://igreelssave.com/photo
 - About: https://igreelssave.com/about
-- Contact: https://igreelssave.com/contact
 - Privacy Policy: https://igreelssave.com/privacy
 - Terms of Use: https://igreelssave.com/terms
-
-## Contact
-For bug reports or takedown requests: https://igreelssave.com/contact
 
 ## Legal
 - Only downloads public Instagram content
