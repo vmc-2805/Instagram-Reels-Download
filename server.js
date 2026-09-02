@@ -28,6 +28,13 @@ app.use(
   })
 );
 
+// API endpoints are data, not pages — never let crawlers index or cache them.
+app.use('/api', (req, res, next) => {
+  res.set('X-Robots-Tag', 'noindex, nofollow');
+  res.set('Cache-Control', 'no-store');
+  next();
+});
+
 app.use('/api', apiRouter);
 
 // Pages themselves must not be cached, otherwise a browser holding yesterday's
