@@ -56,6 +56,7 @@ router.post('/fetch', limiter, express.json({ limit: '8kb' }), async (req, res) 
           // asset is handed back as a same-origin download link.
           downloadUrl:
             `/api/download?u=${encodeURIComponent(item.url)}` +
+            `&type=${item.type}` +
             `&filename=${encodeURIComponent(
               `${result.owner?.username || 'instagram'}_${result.shortcode || 'media'}` +
                 `${result.media.length > 1 ? `_${index + 1}` : ''}` +
@@ -91,7 +92,7 @@ router.post('/fetch', limiter, express.json({ limit: '8kb' }), async (req, res) 
 router.get('/download', async (req, res) => {
   try {
     const url = safeMediaUrl(req.query.u);
-    const isVideo = /\.mp4|video/i.test(url.pathname) || req.query.type === 'video';
+    const isVideo = req.query.type === 'video' || /\.mp4|video/i.test(url.pathname);
     const filename = sanitizeFilename(
       req.query.filename,
       `instagram-${Date.now()}.${isVideo ? 'mp4' : 'jpg'}`
@@ -106,10 +107,17 @@ router.get('/download', async (req, res) => {
       return res.status(502).json({ ok: false, error: 'The media link expired. Fetch the post again.' });
     }
 
-    res.set('Content-Type', upstream.headers.get('content-type') || 'application/octet-stream');
+    const upstreamCT = upstream.headers.get('content-type') || '';
+    const detectedVideo = isVideo || /video/i.test(upstreamCT);
+    const ext = detectedVideo ? 'mp4' : 'jpg';
+
+    // If the filename extension doesn't match the actual content type, fix it.
+    const fixedFilename = filename.replace(/\.[^.]+$/, `.${ext}`);
+
+    res.set('Content-Type', detectedVideo ? 'video/mp4' : (upstreamCT || 'image/jpeg'));
     const length = upstream.headers.get('content-length');
     if (length) res.set('Content-Length', length);
-    res.set('Content-Disposition', `attachment; filename="${filename}"`);
+    res.set('Content-Disposition', `attachment; filename="${fixedFilename}"`);
     res.set('Cache-Control', 'no-store');
 
     const { Readable } = require('stream');

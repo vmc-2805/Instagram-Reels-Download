@@ -17,7 +17,7 @@ function harvest(node, found = [], depth = 0) {
 
   if (typeof node === 'string') {
     if (/^https?:\/\//.test(node) && MEDIA_HOST.test(node)) {
-      const isVideo = /\.mp4|video/i.test(node);
+      const isVideo = /\.mp4|video|reels?/i.test(node);
       if (!found.some((item) => item.url === node)) {
         found.push({
           type: isVideo ? 'video' : 'image',

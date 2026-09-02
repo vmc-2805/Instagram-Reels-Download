@@ -122,7 +122,8 @@ function normalizeApiItem(item) {
     const image = pickLargest(node.image_versions2?.candidates || []);
     const video = pickLargest(node.video_versions || []);
 
-    if (node.media_type === 2 && video) {
+    if (node.media_type === 2) {
+      if (!video) return null;
       return {
         type: 'video',
         url: video.url,
@@ -167,10 +168,16 @@ function normalizeGraphMedia(node) {
   };
 
   const flatten = (n) => {
-    if (n.is_video && n.video_url) {
+    if (n.is_video) {
+      const url =
+        n.video_url ||
+        n.video_resources?.[0]?.url ||
+        n.video_versions?.[0]?.url ||
+        '';
+      if (!url) return null;
       return {
         type: 'video',
-        url: n.video_url,
+        url,
         thumbnail: n.display_url || '',
         width: n.dimensions?.width || null,
         height: n.dimensions?.height || null,
@@ -279,14 +286,20 @@ async function viaEmbed(shortcode) {
         context?.graphql?.shortcode_media ||
         context?.shortcode_media ||
         context?.media;
-      if (node) return normalizeGraphMedia(node);
+      if (node) {
+        const result = normalizeGraphMedia(node);
+        if (result?.media?.length) return result;
+      }
     } catch {
       /* fall through to the regex scrape below */
     }
   }
 
   // Last resort inside the embed: pull the raw urls out of the markup.
-  const videoUrl = html.match(/"video_url"\s*:\s*"([^"]+)"/)?.[1];
+  const videoUrl =
+    html.match(/"video_url"\s*:\s*"([^"]+)"/)?.[1] ||
+    html.match(/"video_versions"\s*:\s*\[?\{[^}]*"url"\s*:\s*"([^"]+)"/)?.[1] ||
+    html.match(/src="(https?:\/\/[^"]*\.mp4[^"]*)"/)?.[1];
   const displayUrl =
     html.match(/"display_url"\s*:\s*"([^"]+)"/)?.[1] ||
     html.match(/class="EmbeddedMediaImage"[^>]+src="([^"]+)"/)?.[1];
@@ -455,7 +468,8 @@ async function resolveStory({ username, storyId }) {
     .map((item) => {
       const image = pickLargest(item.image_versions2?.candidates || []);
       const video = pickLargest(item.video_versions || []);
-      if (item.media_type === 2 && video) {
+      if (item.media_type === 2) {
+        if (!video) return null;
         return {
           type: 'video',
           url: video.url,
