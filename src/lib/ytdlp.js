@@ -1,17 +1,43 @@
 'use strict';
 
 const { execFile } = require('child_process');
+const fs = require('fs');
+const path = require('path');
 const config = require('./../config');
 
 let availability = null;
 
+/**
+ * Locate the yt-dlp binary. Precedence:
+ *   1. YTDLP_PATH from .env
+ *   2. A bundled binary inside this project's bin/ folder (so deploying the
+ *      project ships yt-dlp with it — no server-side install needed).
+ * Returns null when nothing is available.
+ */
+function resolveBinary() {
+  if (config.ytdlpPath) return config.ytdlpPath;
+
+  const candidates = [
+    path.join(__dirname, '..', '..', 'bin', 'yt-dlp.exe'),
+    path.join(__dirname, '..', '..', 'bin', 'yt-dlp'),
+  ];
+
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) return candidate;
+  }
+
+  return null;
+}
+
+let resolvedBinary = resolveBinary();
+
 /** Cached check so a missing binary is only probed once per process. */
 function isAvailable() {
-  if (!config.ytdlpPath) return Promise.resolve(false);
+  if (!resolvedBinary) return Promise.resolve(false);
   if (availability) return availability;
 
   availability = new Promise((resolve) => {
-    execFile(config.ytdlpPath, ['--version'], { timeout: 8000 }, (error) => resolve(!error));
+    execFile(resolvedBinary, ['--version'], { timeout: 8000 }, (error) => resolve(!error));
   });
 
   return availability;
@@ -20,7 +46,7 @@ function isAvailable() {
 function run(args, { timeoutMs = 45000 } = {}) {
   return new Promise((resolve, reject) => {
     execFile(
-      config.ytdlpPath,
+      resolvedBinary,
       args,
       { timeout: timeoutMs, maxBuffer: 32 * 1024 * 1024, windowsHide: true },
       (error, stdout, stderr) => {
