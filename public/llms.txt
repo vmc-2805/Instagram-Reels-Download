@@ -3,33 +3,38 @@
 > Free online tool to download Instagram videos, reels, photos, and audio (MP3) in original quality. No sign-in required.
 
 ## What It Does
-- Download Instagram videos and reels as MP4 in original quality
-- Extract Instagram reel audio and save as MP3
-- Download Instagram photos and carousels in full resolution JPG
-- Supports public posts, reels, carousels, and feed videos
+
+- [Download Instagram videos and reels as MP4 in original quality](https://igreelssave.com/)
+- [Extract Instagram reel audio and save as MP3](https://igreelssave.com/audio)
+- [Download Instagram photos and carousels in full resolution JPG](https://igreelssave.com/photo)
+- [Supports public posts, reels, carousels, and feed videos](https://igreelssave.com/)
 
 ## How It Works
-1. Copy the Instagram post/reel URL
-2. Paste it on the site
-3. Download the media file directly
+
+- [Copy the Instagram post/reel URL](https://igreelssave.com/)
+- [Paste it on the site](https://igreelssave.com/)
+- [Download the media file directly](https://igreelssave.com/)
 
 ## Key Features
-- No account or login required
-- Original quality files from Instagram CDN
-- Works on mobile, tablet, and desktop
-- Free with no download limits
-- Supports carousels (multiple slides)
-- No files stored on servers
+
+- [No account or login required](https://igreelssave.com/)
+- [Original quality files from Instagram CDN](https://igreelssave.com/)
+- [Works on mobile, tablet, and desktop](https://igreelssave.com/)
+- [Free with no download limits](https://igreelssave.com/)
+- [Supports carousels (multiple slides)](https://igreelssave.com/)
+- [No files stored on servers](https://igreelssave.com/)
 
 ## Pages
-- Home (Video Downloader): https://igreelssave.com/
-- Reels Audio to MP3: https://igreelssave.com/audio
-- Photo Downloader: https://igreelssave.com/photo
-- About: https://igreelssave.com/about
-- Privacy Policy: https://igreelssave.com/privacy
-- Terms of Use: https://igreelssave.com/terms
+
+- [Home (Video Downloader)](https://igreelssave.com/): Download Instagram videos and reels
+- [Reels Audio to MP3](https://igreelssave.com/audio): Extract reel audio as MP3
+- [Photo Downloader](https://igreelssave.com/photo): Download photos and carousels
+- [About](https://igreelssave.com/about): Learn how InstaSaver works
+- [Privacy Policy](https://igreelssave.com/privacy): Data and privacy handling
+- [Terms of Use](https://igreelssave.com/terms): Terms and conditions
 
 ## Legal
-- Only downloads public Instagram content
-- Not affiliated with Instagram or Meta Platforms, Inc.
-- Users must respect copyright and only download content they have rights to
+
+- [Only downloads public Instagram content](https://igreelssave.com/terms)
+- [Not affiliated with Instagram or Meta Platforms, Inc.](https://igreelssave.com/about)
+- [Users must respect copyright and only download content they have rights to](https://igreelssave.com/terms)
