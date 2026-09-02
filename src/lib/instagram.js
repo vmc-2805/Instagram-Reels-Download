@@ -17,7 +17,7 @@ const DOC_IDS = ['8845758582119845', '10015901848480474', '9510064595728286'];
 
 const LOGIN_REQUIRED_HINT =
   'Instagram would not serve this post to an anonymous request. Set IG_SESSIONID in .env, ' +
-  'or install yt-dlp and set YTDLP_PATH, then try again.';
+  'or make sure the yt-dlp fallback is available, then try again.';
 
 class ResolveError extends Error {
   constructor(message, status = 400) {

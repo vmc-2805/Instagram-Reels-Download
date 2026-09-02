@@ -2,7 +2,8 @@
 
 A complete, working Instagram downloader: paste a public post or reel link and
 get the original MP4 / JPG back — or, on the audio page, just the sound as an
-MP3. Express server, vanilla front end, no build step, one npm dependency.
+MP3. Express server, vanilla front end, no build step, minimal npm dependencies
+(`express` and `yt-dlp-exec`).
 
 ```
 npm install
@@ -54,8 +55,9 @@ one that yields media:
    in `src/lib/http.js` does that once per process. Without those cookies the
    endpoint answers `403`.
 3. **`provider`** — optional third-party resolver API (see below).
-4. **`yt-dlp`** — optional local binary. The most resilient fallback when
-   Instagram changes something.
+4. **`yt-dlp`** — provided by the `yt-dlp-exec` npm package (bundled binary, no
+   Python or separate install needed). The most resilient fallback when
+   Instagram changes something, and how reels resolve to MP4.
 5. **`embed`** — the public embed page.
 6. **`open-graph`** — `og:` meta tags. Usually only the preview image, so a
    result from this strategy is returned with a `warning` shown in the UI.
@@ -73,7 +75,8 @@ As of now, logged-out access is heavily restricted:
 - GraphQL works anonymously **only** with guest cookies attached (implemented).
 
 So videos resolve out of the box, but if Instagram tightens things further, set
-`IG_SESSIONID` or `YTDLP_PATH` — both paths are already wired up.
+`IG_SESSIONID` — or rely on the bundled `yt-dlp` strategy — both paths are
+already wired up.
 
 ## Configuration
 
@@ -86,7 +89,7 @@ Copy `.env.example` to `.env`. Everything is optional except the port.
 | `FFMPEG_PATH` | Path to ffmpeg (default `ffmpeg`). **Required by `/audio`** — without it that page returns a 503 explaining what to install |
 | `AUDIO_BITRATE` | MP3 bitrate for extracted audio (default `192k`) |
 | `IG_SESSIONID`, `IG_CSRFTOKEN` | Session cookies from a throwaway account. Unlocks the mobile-API strategy and makes lookups far more reliable |
-| `YTDLP_PATH` | Path to a `yt-dlp` binary (or `yt-dlp` if on PATH) |
+| `YTDLP_PATH` | Optional override path to a `yt-dlp` binary. Leave empty — the `yt-dlp-exec` npm package supplies its own bundled yt-dlp (no Python, no separate install needed) |
 | `IG_COOKIES_FILE` | Netscape `cookies.txt` for yt-dlp |
 | `PROVIDER_URL`, `PROVIDER_KEY`, `PROVIDER_HOST` | Optional third-party resolver. `{url}` in the URL is replaced with the encoded post link; the response is walked for Instagram CDN URLs, so most RapidAPI-style providers work without code changes |
 | `RATE_LIMIT_PER_MINUTE` | Per-IP limit on `/api/fetch` (default `20`) |
@@ -161,7 +164,7 @@ src/config.js             .env loader + settings
 src/lib/http.js           fetch wrapper, guest-cookie bootstrap, headers
 src/lib/instagram.js      URL parsing, strategies, normalisers
 src/lib/audio.js          ffmpeg MP3 extraction (streamed, nothing on disk)
-src/lib/ytdlp.js          optional yt-dlp fallback
+src/lib/ytdlp.js          yt-dlp via yt-dlp-exec (bundled, no Python/install)
 src/lib/provider.js       optional third-party resolver
 src/lib/cache.js          TTL cache
 src/lib/ratelimit.js      per-IP limiter
@@ -179,8 +182,8 @@ keep in mind:
 
 - Set `SITE_URL` so canonical tags and the sitemap are correct.
 - Datacenter IPs get blocked by Instagram faster than residential ones. If
-  lookups start failing in production, add a session cookie or run yt-dlp with
-  cookies.
+  lookups start failing in production, add a session cookie (`IG_SESSIONID`) or
+  supply `IG_COOKIES_FILE` for yt-dlp.
 
 ## Legal
 
