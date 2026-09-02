@@ -6,7 +6,7 @@ const seoConfig = {
   '/': {
     title: 'InstaSaver — Instagram Video Downloader (HD & Free)',
     description: 'Download Instagram videos, reels, photos, and carousels in HD quality for free. Fast, no registration needed, works on mobile & desktop.',
-    robots: 'index, follow',
+    robots: 'noindex, nofollow',
     ogImage: '/og-image.png',
     breadcrumbs: [], // Home is the root, no breadcrumbs displayed
     schema: (url) => [
@@ -37,7 +37,7 @@ const seoConfig = {
   '/audio': {
     title: 'Instagram Reels Audio Downloader — Reel to MP3',
     description: 'Convert and download Instagram reels audio to MP3 in high quality. Extract sound from any public Instagram reel easily for free.',
-    robots: 'index, follow',
+    robots: 'noindex, nofollow',
     ogImage: '/og-image.png',
     breadcrumbs: [
       { name: 'Home', item: '/', key: 'seo.bread.home' },
@@ -64,7 +64,7 @@ const seoConfig = {
   '/photo': {
     title: 'Instagram Photo Downloader — Download Full HD JPG',
     description: 'Download Instagram photos and carousels in high resolution JPG format. Simple, fast and free Instagram picture downloader.',
-    robots: 'index, follow',
+    robots: 'noindex, nofollow',
     ogImage: '/og-image.png',
     breadcrumbs: [
       { name: 'Home', item: '/', key: 'seo.bread.home' },
@@ -91,7 +91,7 @@ const seoConfig = {
   '/about': {
     title: 'About InstaSaver — Free Instagram Downloader',
     description: 'Learn more about InstaSaver, a free web tool to download Instagram videos, reels, photos, and audio. Simple, fast, and no registration.',
-    robots: 'index, follow',
+    robots: 'noindex, nofollow',
     ogImage: '/og-image.png',
     breadcrumbs: [
       { name: 'Home', item: '/', key: 'seo.bread.home' },
@@ -111,7 +111,7 @@ const seoConfig = {
   '/privacy': {
     title: 'Privacy Policy | InstaSaver Instagram Downloader',
     description: 'Read the privacy policy of InstaSaver. Learn how we handle your data, rate limit checks, logs, and respect your privacy.',
-    robots: 'index, follow',
+    robots: 'noindex, nofollow',
     ogImage: '/og-image.png',
     breadcrumbs: [
       { name: 'Home', item: '/', key: 'seo.bread.home' },
@@ -130,7 +130,7 @@ const seoConfig = {
   '/terms': {
     title: 'Terms of Use | InstaSaver Instagram Downloader',
     description: 'Understand the terms of use for InstaSaver. Guidelines on acceptable usage, copyright compliance, and disclaimer of liability.',
-    robots: 'index, follow',
+    robots: 'noindex, nofollow',
     ogImage: '/og-image.png',
     breadcrumbs: [
       { name: 'Home', item: '/', key: 'seo.bread.home' },
