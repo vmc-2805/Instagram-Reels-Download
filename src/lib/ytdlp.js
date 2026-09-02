@@ -1,89 +1,35 @@
 'use strict';
 
-const { execFile } = require('child_process');
-const fs = require('fs');
-const path = require('path');
 const config = require('./../config');
+
+/**
+ * yt-dlp is provided by the `yt-dlp-exec` npm package, which bundles its own
+ * yt-dlp binary inside node_modules — no separate install, no YTDLP_PATH
+ * needed, and it works the same on Windows and Linux (important for the
+ * Vercel/serverless deployment).
+ */
+const ytDlpExec = require('yt-dlp-exec');
 
 let availability = null;
 
-/**
- * Candidate bundled binaries, in preference order. The Windows build carries a
- * .exe suffix and only runs on win32; the bare name is the Linux binary. Both
- * can coexist in bin/, so we pick by platform first, then try the rest.
- */
-function bundledCandidates() {
-  const binDir = path.join(__dirname, '..', '..', 'bin');
-  const isWin = process.platform === 'win32';
-
-  const preferred = isWin
-    ? [path.join(binDir, 'yt-dlp.exe'), path.join(binDir, 'yt-dlp')]
-    : [path.join(binDir, 'yt-dlp'), path.join(binDir, 'yt-dlp.exe')];
-
-  return preferred;
-}
-
-/**
- * Locate the yt-dlp binary. Precedence:
- *   1. YTDLP_PATH from .env
- *   2. A bundled binary inside this project's bin/ folder (so deploying the
- *      project ships yt-dlp with it — no server-side install needed).
- * Returns the first candidate that both exists and actually runs, or null.
- */
-function resolveBinary() {
-  if (config.ytdlpPath) return config.ytdlpPath;
-
-  const candidates = bundledCandidates();
-  for (const candidate of candidates) {
-    if (!fs.existsSync(candidate)) continue;
-    // Prefer candidates whose extension matches the current platform, and only
-    // fall back to a cross-platform mismatch if nothing else is usable. The
-    // real validation happens in isAvailable() when the binary is executed.
-    return candidate;
-  }
-
-  return null;
-}
-
-let resolvedBinary = resolveBinary();
-
-/** Cached check so a missing binary is only probed once per process. */
+/** Cached check — yt-dlp-exec is always available once installed. */
 function isAvailable() {
-  if (!resolvedBinary) return Promise.resolve(false);
   if (availability) return availability;
-
-  availability = new Promise((resolve) => {
-    execFile(resolvedBinary, ['--version'], { timeout: 8000 }, (error) => resolve(!error));
-  });
-
+  availability = Promise.resolve(true);
   return availability;
-}
-
-function run(args, { timeoutMs = 45000 } = {}) {
-  return new Promise((resolve, reject) => {
-    execFile(
-      resolvedBinary,
-      args,
-      { timeout: timeoutMs, maxBuffer: 32 * 1024 * 1024, windowsHide: true },
-      (error, stdout, stderr) => {
-        if (error) {
-          const message = (stderr || error.message || '').split('\n').filter(Boolean).pop();
-          return reject(new Error(message || 'yt-dlp failed'));
-        }
-        resolve(stdout);
-      }
-    );
-  });
 }
 
 /** Returns yt-dlp's JSON description of a post, or throws. */
 async function dumpJson(url) {
-  const args = ['--dump-single-json', '--no-warnings', '--no-progress'];
-  if (config.cookiesFile) args.push('--cookies', config.cookiesFile);
-  args.push(url);
+  const options = {
+    dumpSingleJson: true,
+    noWarnings: true,
+    noProgress: true,
+  };
+  if (config.cookiesFile) options.cookies = config.cookiesFile;
 
-  const stdout = await run(args);
-  return JSON.parse(stdout);
+  const info = await ytDlpExec(url, options);
+  return info;
 }
 
 const bestVideo = (formats = []) =>
