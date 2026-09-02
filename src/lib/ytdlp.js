@@ -8,22 +8,38 @@ const config = require('./../config');
 let availability = null;
 
 /**
+ * Candidate bundled binaries, in preference order. The Windows build carries a
+ * .exe suffix and only runs on win32; the bare name is the Linux binary. Both
+ * can coexist in bin/, so we pick by platform first, then try the rest.
+ */
+function bundledCandidates() {
+  const binDir = path.join(__dirname, '..', '..', 'bin');
+  const isWin = process.platform === 'win32';
+
+  const preferred = isWin
+    ? [path.join(binDir, 'yt-dlp.exe'), path.join(binDir, 'yt-dlp')]
+    : [path.join(binDir, 'yt-dlp'), path.join(binDir, 'yt-dlp.exe')];
+
+  return preferred;
+}
+
+/**
  * Locate the yt-dlp binary. Precedence:
  *   1. YTDLP_PATH from .env
  *   2. A bundled binary inside this project's bin/ folder (so deploying the
  *      project ships yt-dlp with it — no server-side install needed).
- * Returns null when nothing is available.
+ * Returns the first candidate that both exists and actually runs, or null.
  */
 function resolveBinary() {
   if (config.ytdlpPath) return config.ytdlpPath;
 
-  const candidates = [
-    path.join(__dirname, '..', '..', 'bin', 'yt-dlp.exe'),
-    path.join(__dirname, '..', '..', 'bin', 'yt-dlp'),
-  ];
-
+  const candidates = bundledCandidates();
   for (const candidate of candidates) {
-    if (fs.existsSync(candidate)) return candidate;
+    if (!fs.existsSync(candidate)) continue;
+    // Prefer candidates whose extension matches the current platform, and only
+    // fall back to a cross-platform mismatch if nothing else is usable. The
+    // real validation happens in isAvailable() when the binary is executed.
+    return candidate;
   }
 
   return null;
