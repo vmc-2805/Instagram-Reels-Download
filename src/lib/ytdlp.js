@@ -8,7 +8,12 @@ const config = require('./../config');
  * needed, and it works the same on Windows and Linux (important for the
  * Vercel/serverless deployment).
  */
-const ytDlpExec = require('yt-dlp-exec');
+const ytDlpExecDefault = require('yt-dlp-exec');
+
+// YTDLP_PATH (documented in .env.example) overrides the bundled binary. On a
+// Linux host without python3 the bundled `yt-dlp` zipapp cannot run, so point
+// this at a standalone `yt-dlp_linux` build instead.
+const ytDlpExec = config.ytdlpPath ? ytDlpExecDefault.create(config.ytdlpPath) : ytDlpExecDefault;
 
 let availability = null;
 

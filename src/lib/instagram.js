@@ -437,22 +437,41 @@ async function resolvePost(shortcode) {
   strategies.push(['embed', () => viaEmbed(shortcode)], ['open-graph', () => viaOpenGraph(shortcode)]);
 
   const failures = [];
+  // Flipped once a strategy has proven the post is a video. From then on a
+  // fallback that can only offer the poster image is refused — a video
+  // request must never be answered with a JPG.
+  let knownVideo = false;
 
   for (const [name, strategy] of strategies) {
     try {
       const result = await strategy();
       if (result?.media?.length) {
+        if (knownVideo && !result.media.some((item) => item.type === 'video')) {
+          failures.push(`${name}: only the preview image of a video post`);
+          continue;
+        }
         result.source = name;
         result.postUrl = postUrl;
-        return cache.set(cacheKey, result);
+        // Degraded answers (preview image only, flagged with a warning) are not
+        // cached, so the next attempt gets a fresh shot at the real video.
+        return result.warning ? result : cache.set(cacheKey, result);
       }
       failures.push(`${name}: empty result`);
     } catch (error) {
+      if (/preview image for this video/i.test(error.message)) knownVideo = true;
       failures.push(`${name}: ${error.message}`);
     }
   }
 
   console.warn(`[resolve] ${shortcode} failed ->`, failures.join(' | '));
+
+  if (knownVideo) {
+    throw new ResolveError(
+      'This is a video, but Instagram only served its preview image right now. ' +
+        'Try again in a moment. On the server, set IG_COOKIES_FILE or IG_SESSIONID in .env for reliable video access.',
+      503
+    );
+  }
 
   // If any strategy got a clean answer that simply held no media, the post is
   // gone or private — that is a 404, not a block, and the message must differ.
