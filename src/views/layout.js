@@ -120,7 +120,7 @@ function layout({
   canonical = '/',
   body,
   jsonLd = null,
-  robots = 'index, follow',
+  robots = 'index, follow, max-image-preview:large',
   ogImage = '/og-image.png',
   breadcrumbs = [],
   renderBreadcrumbNav = true
