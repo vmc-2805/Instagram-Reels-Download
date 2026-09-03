@@ -283,7 +283,11 @@ async function viaEmbed(shortcode) {
     try {
       const decoded = JSON.parse(`"${contextMatch[1]}"`);
       const context = JSON.parse(decoded);
+      // Instagram has moved the media graph around over time: older embeds
+      // used `graphql.shortcode_media`, current ones ship it under `gql_data`.
       const node =
+        context?.gql_data?.shortcode_media ||
+        context?.gql_data?.xdt_shortcode_media ||
         context?.graphql?.shortcode_media ||
         context?.shortcode_media ||
         context?.media;
@@ -296,18 +300,40 @@ async function viaEmbed(shortcode) {
     }
   }
 
-  // Last resort inside the embed: pull the raw urls out of the markup.
+  // Last resort inside the embed: pull the raw urls out of the markup. The
+  // JSON keys may be escaped (`\"video_url\":\"...`) when they sit inside the
+  // contextJSON string, so the quotes are matched with an optional backslash.
   const videoUrl =
-    html.match(/"video_url"\s*:\s*"([^"]+)"/)?.[1] ||
-    html.match(/"video_versions"\s*:\s*\[?\{[^}]*"url"\s*:\s*"([^"]+)"/)?.[1] ||
+    html.match(/\\?"video_url\\?"\s*:\s*\\?"((?:\\.|[^"\\])+?)\\?"/)?.[1] ||
+    html.match(/\\?"video_versions\\?"\s*:\s*\[?\{[^}]*\\?"url\\?"\s*:\s*\\?"((?:\\.|[^"\\])+?)\\?"/)?.[1] ||
     html.match(/src="(https?:\/\/[^"]*\.mp4[^"]*)"/)?.[1];
   const displayUrl =
-    html.match(/"display_url"\s*:\s*"([^"]+)"/)?.[1] ||
+    html.match(/\\?"display_url\\?"\s*:\s*\\?"((?:\\.|[^"\\])+?)\\?"/)?.[1] ||
     html.match(/class="EmbeddedMediaImage"[^>]+src="([^"]+)"/)?.[1];
-  const username = html.match(/"username"\s*:\s*"([^"]+)"/)?.[1] || 'instagram';
+  const username = html.match(/\\?"username\\?"\s*:\s*\\?"([^"\\]+)/)?.[1] || 'instagram';
 
-  const unescape = (value) =>
-    value ? JSON.parse(`"${value.replace(/&amp;/g, '&')}"`) : '';
+  // The embed markup tells us when the post is a video even if the MP4 url
+  // itself could not be located. In that case the poster image must NOT be
+  // handed back as the download — a video request has to yield a video.
+  const isVideoPost =
+    /data-media-type="GraphVideo"/.test(html) || /\\?"is_video\\?"\s*:\s*true/.test(html);
+  if (isVideoPost && !videoUrl) {
+    throw new ResolveError('Embed page exposed only the preview image for this video.', 502);
+  }
+
+  const unescape = (value) => {
+    if (!value) return '';
+    // Values may be doubly escaped (JSON inside a JSON string inside HTML).
+    let out = value.replace(/&amp;/g, '&');
+    for (let i = 0; i < 3 && /\\/.test(out); i += 1) {
+      try {
+        out = JSON.parse(`"${out}"`);
+      } catch {
+        break;
+      }
+    }
+    return out;
+  };
 
   if (videoUrl || displayUrl) {
     const thumbnail = unescape(displayUrl);

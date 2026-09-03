@@ -107,12 +107,40 @@ async function isAvailable() {
  * Normalise an instadl Media object ({url,type,ext,...}) into the project's
  * media shape ({type,url,thumbnail,width,height,duration}).
  */
+const IG_CDN = /(^|\.)(cdninstagram\.com|fbcdn\.net|instagram\.com)$/i;
+
+/**
+ * Downloader sites often hand back their own proxy link
+ * (e.g. media.sssinstagram.com/get?...&uri=<real cdn url>). /api/download only
+ * proxies Instagram's CDNs, so unwrap the real CDN url whenever one is embedded.
+ */
+function unwrapCdnUrl(raw) {
+  if (!raw) return raw;
+  try {
+    const url = new URL(raw);
+    if (IG_CDN.test(url.hostname)) return raw;
+    for (const key of ['uri', 'url', 'u']) {
+      const inner = url.searchParams.get(key);
+      if (!inner) continue;
+      try {
+        if (IG_CDN.test(new URL(inner).hostname)) return inner;
+      } catch {
+        /* not a url */
+      }
+    }
+  } catch {
+    /* not a url */
+  }
+  return raw;
+}
+
 function toMediaItem(item) {
-  const isVideo = item.type === 'mp4' || item.ext === 'mp4' || /\.mp4|video/i.test(item.url || '');
+  const url = unwrapCdnUrl(item.url);
+  const isVideo = item.type === 'mp4' || item.ext === 'mp4' || /\.mp4|video/i.test(url || '');
   return {
     type: isVideo ? 'video' : 'image',
-    url: item.url,
-    thumbnail: item.thumb || '',
+    url,
+    thumbnail: unwrapCdnUrl(item.thumb) || '',
     width: null,
     height: null,
     duration: null,
