@@ -66,10 +66,13 @@ router.post('/fetch', limiter, express.json({ limit: '8kb' }), async (req, res) 
             ? `/api/thumb?u=${encodeURIComponent(item.thumbnail)}`
             : null,
           streamUrl: `/api/thumb?u=${encodeURIComponent(item.url)}`,
-          // Only videos carry an audio track worth extracting.
+          // Only videos carry an audio track worth extracting. Prefer the
+          // dedicated audio-only stream when the resolver exposed one (yt-dlp
+          // returns a separate M4A track for reels — the MP4 itself is
+          // video-only, so ffmpeg would otherwise find no audio).
           audioUrl:
             item.type === 'video'
-              ? `/api/audio?u=${encodeURIComponent(item.url)}` +
+              ? `/api/audio?u=${encodeURIComponent(item.audioUrl || item.url)}` +
                 `&filename=${encodeURIComponent(
                   `${result.owner?.username || 'instagram'}_${result.shortcode || 'audio'}` +
                     `${result.media.length > 1 ? `_${index + 1}` : ''}.mp3`

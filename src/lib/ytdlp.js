@@ -37,19 +37,37 @@ const bestVideo = (formats = []) =>
     .filter((f) => f.url && f.vcodec && f.vcodec !== 'none')
     .sort((a, b) => (b.height || 0) - (a.height || 0) || (b.tbr || 0) - (a.tbr || 0))[0];
 
+// Instagram serves reels as separate DASH streams: the video-only MP4 has no
+// audio track, and the soundtrack lives in its own audio-only M4A stream. Picking
+// that stream up front is what lets the /audio route transcode to MP3 instead of
+// failing with "no audio track".
+const bestAudio = (formats = []) =>
+  formats
+    .filter(
+      (f) =>
+        f.url &&
+        f.acodec &&
+        f.acodec !== 'none' &&
+        (!f.vcodec || f.vcodec === 'none')
+    )
+    .sort((a, b) => (b.asr || b.tbr || 0) - (a.asr || a.tbr || 0))[0];
+
 function normalizeEntry(entry) {
   const video = bestVideo(entry.formats || []);
+  const audio = bestAudio(entry.formats || []);
   const thumbnail =
     entry.thumbnail ||
     (entry.thumbnails || []).slice(-1)[0]?.url ||
     '';
 
-  if (video || entry.ext === 'mp4') {
+  if (video || entry.ext === 'mp4' || entry.ext === 'm4a') {
     const url = video?.url || entry.url;
     if (!url) return null;
     return {
       type: 'video',
       url,
+      // The dedicated audio-only stream, so /audio can extract MP3 reliably.
+      audioUrl: audio?.url || null,
       thumbnail,
       width: video?.width || entry.width || null,
       height: video?.height || entry.height || null,

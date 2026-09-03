@@ -5,6 +5,7 @@ const { TtlCache } = require('./cache');
 const { request, getText, getJson, baseHeaders, ensureGuestSession, IG_APP_ID } = require('./http');
 const ytdlp = require('./ytdlp');
 const provider = require('./provider');
+const instadl = require('./instadl');
 
 const cache = new TtlCache({ ttlMs: config.cacheTtlMs, maxEntries: 500 });
 
@@ -397,6 +398,14 @@ async function resolvePost(shortcode) {
 
   if (await ytdlp.isAvailable()) {
     strategies.push(['yt-dlp', () => ytdlp.resolveWithYtDlp(postUrl, shortcode)]);
+  }
+
+  // instadl drives a headless browser through a downloader site to get the
+  // direct MP4. It is the most reliable way to obtain a reel's *video* (the
+  // embed/open-graph fallbacks below can only hand back a preview image to
+  // anonymous requests), so it runs before those.
+  if (await instadl.isAvailable()) {
+    strategies.push(['instadl', () => instadl.resolveWithInstadl(postUrl, shortcode)]);
   }
 
   strategies.push(['embed', () => viaEmbed(shortcode)], ['open-graph', () => viaOpenGraph(shortcode)]);
