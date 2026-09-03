@@ -365,8 +365,6 @@
 
     const downloadIcon =
       '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="m7 11 5 5 5-5"/><path d="M5 20h14"/></svg>';
-    const copyIcon =
-      '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2.5"/><path d="M5 15V5.5A2.5 2.5 0 0 1 7.5 3H15"/></svg>';
 
     const items = mediaList
       .map((item, index) => {
@@ -397,11 +395,6 @@
                 ${downloadIcon}
                 Download MP3
               </a>
-              <button class="copy-btn" type="button" data-copy="${escapeHtml(
-                location.origin + item.audioUrl
-              )}" aria-label="Copy MP3 link" title="Copy MP3 link">
-                ${copyIcon}
-              </button>
             </div>
           </article>`;
         }
@@ -437,9 +430,6 @@
               ${downloadIcon}
               ${isVideo ? 'Download MP4' : 'Download JPG'}
             </a>
-            <button class="copy-btn" type="button" data-copy="${escapeHtml(item.url)}" aria-label="Copy direct link" title="Copy direct link">
-              ${copyIcon}
-            </button>
           </div>
         </article>`;
       })
@@ -480,17 +470,6 @@
         captionToggle.textContent = clamped ? 'Show more' : 'Show less';
       });
     }
-
-    resultBox.querySelectorAll('[data-copy]').forEach((button) => {
-      button.addEventListener('click', async () => {
-        try {
-          await navigator.clipboard.writeText(button.dataset.copy);
-          toast('Direct link copied');
-        } catch {
-          toast('Could not access the clipboard');
-        }
-      });
-    });
 
     resultBox.querySelectorAll('.download-btn').forEach((link) => {
       link.addEventListener('click', () =>
