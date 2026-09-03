@@ -149,7 +149,7 @@ const seoConfig = {
   '404': {
     title: 'Page Not Found | InstaSaver',
     description: 'The requested page was not found on InstaSaver. Go back to our free Instagram video, reel, and photo downloader.',
-    robots: 'noindex, nofollow',
+    robots: 'index, follow',
     ogImage: '/og-image.png',
     breadcrumbs: [
       { name: 'Home', item: '/', key: 'seo.bread.home' },

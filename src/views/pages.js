@@ -675,7 +675,7 @@ const notFound = () => {
     title: routeSeo.title || `Page not found | ${config.siteName}`,
     description: routeSeo.description || 'That page does not exist.',
     canonical: '/404',
-    robots: routeSeo.robots || 'noindex, nofollow',
+    robots: routeSeo.robots || 'index, follow',
     ogImage: routeSeo.ogImage,
     breadcrumbs: routeSeo.breadcrumbs,
     jsonLd: routeSchemas,
