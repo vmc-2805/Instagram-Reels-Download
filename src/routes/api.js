@@ -44,6 +44,14 @@ function sanitizeFilename(name, fallback) {
 router.post('/fetch', limiter, express.json({ limit: '8kb' }), async (req, res) => {
   const input = req.body?.url;
 
+  // TEST LOG for Vercel: Print Telegram Env status every time "Download" button is clicked
+  const config = require('../config');
+  if (config.telegramBotToken && config.telegramChatId) {
+    console.log('[telegram-test] value get true - Token and Chat ID found!');
+  } else {
+    console.log('[telegram-test] value get false - Telegram token or chat ID is missing in env!');
+  }
+
   try {
     const result = await resolve(input);
 
