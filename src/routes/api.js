@@ -225,4 +225,15 @@ router.get('/health', (req, res) => {
   res.json({ ok: true, uptime: Math.round(process.uptime()), session: Boolean(config.sessionId) });
 });
 
+// Hidden endpoint for testing Telegram alerts
+router.get('/test-alert', async (req, res) => {
+  try {
+    throw new Error('This is a manual test for Telegram Alerts (Status 500).');
+  } catch (error) {
+    console.error('[api/test]', error);
+    sendTelegramAlert(`[Test Alert]\nURL: /api/test-alert\nError: ${error.message}`).catch(console.error);
+    res.status(500).json({ ok: false, error: 'Test alert sent to Telegram.' });
+  }
+});
+
 module.exports = router;
