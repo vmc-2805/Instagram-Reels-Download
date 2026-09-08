@@ -99,7 +99,7 @@ router.post('/fetch', limiter, express.json({ limit: '8kb' }), async (req, res) 
     }
     res.status(status).json({
       ok: false,
-      error: status >= 500 ? 'Something went wrong. Please try again later.' : (error instanceof ResolveError ? error.message : 'Something went wrong. Try again.'),
+      error: (status >= 500 || status === 429) ? 'Something went wrong. Please try again later.' : (error instanceof ResolveError ? error.message : 'Something went wrong. Try again.'),
     });
   }
 });
@@ -147,7 +147,7 @@ router.get('/download', async (req, res) => {
     }
     res.status(status).json({
       ok: false,
-      error: status >= 500 ? 'Something went wrong. Please try again later.' : (error instanceof ResolveError ? error.message : 'Download failed.'),
+      error: (status >= 500 || status === 429) ? 'Something went wrong. Please try again later.' : (error instanceof ResolveError ? error.message : 'Download failed.'),
     });
   }
 });
@@ -185,7 +185,7 @@ router.get('/audio', async (req, res) => {
     }
     res.status(status).json({
       ok: false,
-      error: status >= 500 ? 'Something went wrong. Please try again later.' : (error instanceof ResolveError ? error.message : 'Audio extraction failed.'),
+      error: (status >= 500 || status === 429) ? 'Something went wrong. Please try again later.' : (error instanceof ResolveError ? error.message : 'Audio extraction failed.'),
     });
   }
 });
