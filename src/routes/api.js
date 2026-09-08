@@ -92,11 +92,9 @@ router.post('/fetch', limiter, express.json({ limit: '8kb' }), async (req, res) 
     });
   } catch (error) {
     const status = error instanceof ResolveError ? error.status : 500;
-    if (status >= 500) {
-      console.error('[api/fetch]', error);
-      const safeUrl = String(input || 'unknown').length > 500 ? String(input).slice(0, 500) + '... (truncated)' : (input || 'unknown');
-      sendTelegramAlert(`[Fetch Error]\nURL: ${safeUrl}\nError: ${error.message}`);
-    }
+    console.error('[api/fetch]', error);
+    const safeUrl = String(input || 'unknown').length > 500 ? String(input).slice(0, 500) + '... (truncated)' : (input || 'unknown');
+    sendTelegramAlert(`[Fetch Error]\nURL: ${safeUrl}\nError: ${error.message}`);
     res.status(status).json({
       ok: false,
       error: status >= 500 ? 'Something went wrong. Please try again later.' : (error instanceof ResolveError ? error.message : 'Something went wrong. Try again.'),
@@ -223,17 +221,6 @@ router.get('/thumb', async (req, res) => {
 /* GET /api/health — liveness probe. */
 router.get('/health', (req, res) => {
   res.json({ ok: true, uptime: Math.round(process.uptime()), session: Boolean(config.sessionId) });
-});
-
-// Hidden endpoint for testing Telegram alerts
-router.get('/test-alert', async (req, res) => {
-  try {
-    throw new Error('This is a manual test for Telegram Alerts (Status 500).');
-  } catch (error) {
-    console.error('[api/test]', error);
-    sendTelegramAlert(`[Test Alert]\nURL: /api/test-alert\nError: ${error.message}`).catch(console.error);
-    res.status(500).json({ ok: false, error: 'Test alert sent to Telegram.' });
-  }
 });
 
 module.exports = router;
