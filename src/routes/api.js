@@ -44,13 +44,6 @@ function sanitizeFilename(name, fallback) {
 router.post('/fetch', limiter, express.json({ limit: '8kb' }), async (req, res) => {
   const input = req.body?.url;
 
-  const config = require('../config');
-  const telegramStatus = (config.telegramBotToken && config.telegramChatId) 
-    ? 'value get true' 
-    : 'value get false';
-    
-  console.log('[telegram-test]', telegramStatus);
-
   try {
     const result = await resolve(input);
 
@@ -64,7 +57,6 @@ router.post('/fetch', limiter, express.json({ limit: '8kb' }), async (req, res) 
 
     res.json({
       ok: true,
-      telegram_status: telegramStatus,
       data: {
         ...result,
         media: result.media.map((item, index) => ({
@@ -107,7 +99,6 @@ router.post('/fetch', limiter, express.json({ limit: '8kb' }), async (req, res) 
     }
     res.status(status).json({
       ok: false,
-      telegram_status: telegramStatus,
       error: status >= 500 ? 'Something went wrong. Please try again later.' : (error instanceof ResolveError ? error.message : 'Something went wrong. Try again.'),
     });
   }
@@ -232,17 +223,6 @@ router.get('/thumb', async (req, res) => {
 /* GET /api/health — liveness probe. */
 router.get('/health', (req, res) => {
   res.json({ ok: true, uptime: Math.round(process.uptime()), session: Boolean(config.sessionId) });
-});
-
-// Hidden endpoint for testing Telegram alerts
-router.get('/test-alert', async (req, res) => {
-  try {
-    throw new Error('This is a manual test for Telegram Alerts (Status 500).');
-  } catch (error) {
-    console.error('[api/test]', error);
-    await sendTelegramAlert(`[Test Alert]\nURL: /api/test-alert\nError: ${error.message}`).catch(console.error);
-    res.status(500).json({ ok: false, error: 'Test alert sent to Telegram.' });
-  }
 });
 
 module.exports = router;
