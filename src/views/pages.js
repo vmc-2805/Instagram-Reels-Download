@@ -666,6 +666,50 @@ const terms = () =>
     ]
   );
 
+const sitemap = () => {
+  const links = (items) =>
+    items
+      .map(
+        (item) => `
+    <a class="sitemap-link" href="${item.href}">
+      <strong>${escapeHtml(item.title)}</strong>
+      <span>${escapeHtml(item.desc)}</span>
+    </a>`
+      )
+      .join('');
+
+  return staticPage(
+    '/sitemap',
+    'sitemap.title',
+    'sitemap.desc',
+    `<div class="static-section static-sitemap" id="sitemap-downloaders">
+      <h2 data-i18n="sitemap.downloaders">Downloaders</h2>
+      <div class="sitemap-list">
+        ${links([
+          { href: '/', title: 'Instagram Video Downloader', desc: 'Save videos and reels as MP4 in original quality.' },
+          { href: '/audio', title: 'Reels Audio to MP3', desc: 'Extract reel audio tracks as MP3 files.' },
+          { href: '/photo', title: 'Photo Downloader', desc: 'Download full-size photos and carousels as JPG.' },
+        ])}
+      </div>
+    </div>
+    <div class="static-section static-sitemap" id="sitemap-information">
+      <h2 data-i18n="sitemap.info">Information</h2>
+      <div class="sitemap-list">
+        ${links([
+          { href: '/about', title: 'About', desc: 'How InstaSaver works and what it does.' },
+          { href: '/privacy', title: 'Privacy Policy', desc: 'Data handling, rate limiting and logs.' },
+          { href: '/terms', title: 'Terms of Use', desc: 'Acceptable use and copyright guidance.' },
+          { href: '/sitemap', title: 'Sitemap', desc: 'All pages of this site in one place.' },
+        ])}
+      </div>
+    </div>`,
+    [
+      { id: 'sitemap-downloaders', label: 'Downloaders', key: 'sitemap.downloaders' },
+      { id: 'sitemap-information', label: 'Information', key: 'sitemap.info' },
+    ]
+  );
+};
+
 const notFound = () => {
   const routeSeo = seo['404'] || {};
   const canonicalUrl = `${config.siteUrl}/404`;
@@ -691,4 +735,4 @@ const notFound = () => {
   });
 };
 
-module.exports = { home, audio, photo, about, privacy, terms, notFound };
+module.exports = { home, audio, photo, about, privacy, terms, sitemap, notFound };

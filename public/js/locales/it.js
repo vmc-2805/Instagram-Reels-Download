@@ -13,6 +13,7 @@ window.__locales.it = {
     photo_dl: 'Scarica foto',
     site: 'Sito',
     about: 'Info',
+    sitemap: 'Mappa del sito HTML',
     privacy: 'Informativa sulla privacy',
     terms: 'Termini di utilizzo',
     copy: 'Non \u00e8 affiliato, approvato o sponsorizzato da Instagram o Meta Platforms, Inc.',
@@ -169,6 +170,12 @@ window.__locales.it = {
     'availability.text': 'Il servizio viene fornito cos\u00ec com\u2019\u00e8, senza garanzia di alcun tipo. Instagram pu\u00f2 modificare i propri sistemi in qualsiasi momento, e le funzionalit\u00e0 possono interrompersi o scomparire senza preavviso.',
     'liability.title': 'Responsabilit\u00e0',
     'liability.text': 'Nella misura consentita dalla legge, non accettiamo alcuna responsabilit\u00e0 per qualsiasi perdita derivante dall\u2019utilizzo di questo sito.',
+  },
+  sitemap: {
+    title: 'Mappa del sito HTML',
+    desc: 'Tutte le pagine di questo sito in un unico posto. Sfoglia tutti i downloader e le pagine informative.',
+    downloaders: 'Downloader',
+    info: 'Informazioni',
   },
   error: {
     eyebrow: '404',

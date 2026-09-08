@@ -13,6 +13,7 @@ window.__locales.nl = {
     photo_dl: 'Fotodownloader',
     site: 'Site',
     about: 'Over',
+    sitemap: 'HTML-sitemap',
     privacy: 'Privacybeleid',
     terms: 'Gebruiksvoorwaarden',
     copy: 'Niet gelieerd aan, goedgekeurd of gesponsord door Instagram of Meta Platforms, Inc.',
@@ -117,7 +118,7 @@ window.__locales.nl = {
   afaq: {
     1: { q: 'Wat krijg ik precies?', a: 'Een MP3 op 192 kbps met het audiospoor van de reel \u2014 muziek, stem, effecten en alles. Er wordt geen videobestand aangemaakt of opgeslagen.' },
     2: { q: 'Waarom is de kwaliteit niet beter dan het origineel?', a: 'Het audio in een reel is al gecomprimeerd door Instagram, meestal AAC met een bescheiden bitrate. Het omzetten naar MP3 kan geen details toevoegen die Instagram heeft verwijderd, dus 192 kbps is comfortabel transparant voor deze bron.' },
-    3: { q: 'Kan ik de muziek van de stem scheiden?'', a: 'Nee. De reel heeft \u00e9\u00e3n gemengd audiospoor, dus wat je in de app hoort is wat er in de MP3 terechtkomt.' },
+    3: { q: 'Kan ik de muziek van de stem scheiden?', a: 'Nee. De reel heeft \u00e9\u00e3n gemengd audiospoor, dus wat je in de app hoort is wat er in de MP3 terechtkomt.' },
     4: { q: 'Kan ik de muziek in mijn eigen video\u2019s gebruiken?', a: 'Meestal niet zonder toestemming. De meeste reels-audio is gelicenteerde muziek in bezit van de artiest of het label, en het extraheren ervan geeft je geen licentie. Persoonlijk luisteren is \u00e9\u00e3n ding; publiceren is een ander verhaal.' },
     5: { q: 'Het bericht heeft geen audio. Wat is er gebeurd?', a: 'Sommige berichten zijn stil, en berichten met alleen foto\u2019s hebben helemaal geen audiospoor. In die gevallen is er niets om uit te halen en zal de pagina je dat vertellen.' },
   },
@@ -169,6 +170,12 @@ window.__locales.nl = {
     'availability.text': 'De dienst wordt geleverd zoals deze is, zonder enige vorm van garantie. Instagram kan zijn systemen op elk moment veranderen, en functies kunnen kapot gaan of verdwijnen zonder kennisgeving.',
     'liability.title': 'Aansprakelijkheid',
     'liability.text': 'Voor zover wettelijk toegestaan, aanvaarden wij geen aansprakelijkheid voor enig verlies voortvloeiend uit het gebruik van deze site.',
+  },
+  sitemap: {
+    title: 'HTML-sitemap',
+    desc: 'Alle pagina\'s van deze site op één plek. Blader door alle downloaders en informatiepagina\'s.',
+    downloaders: 'Downloaders',
+    info: 'Informatie',
   },
   error: {
     eyebrow: '404',

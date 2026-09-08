@@ -13,6 +13,7 @@ window.__locales.pt = {
     photo_dl: 'Downloader de foto',
     site: 'Site',
     about: 'Sobre',
+    sitemap: 'Mapa do site HTML',
     privacy: 'Política de privacidade',
     terms: 'Termos de uso',
     copy: 'Não é afiliado, endossado ou patrocinado pelo Instagram ou Meta Platforms, Inc.',
@@ -169,6 +170,12 @@ window.__locales.pt = {
     'availability.text': 'O serviço é fornecido como está, sem garantia de qualquer tipo. O Instagram pode alterar seus sistemas a qualquer momento, e funcionalidades podem falhar ou desaparecer sem aviso.',
     'liability.title': 'Responsabilidade',
     'liability.text': 'Na extensão permitida por lei, não aceitamos nenhuma responsabilidade por qualquer perda decorrente do uso deste site.',
+  },
+  sitemap: {
+    title: 'Mapa do site HTML',
+    desc: 'Todas as páginas deste site em um só lugar. Explore todos os downloaders e páginas de informações.',
+    downloaders: 'Downloaders',
+    info: 'Informações',
   },
   error: {
     eyebrow: '404',

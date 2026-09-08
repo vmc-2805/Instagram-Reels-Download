@@ -100,6 +100,7 @@ function footer() {
           <div class="footer-col">
             <h3 data-i18n="footer.site">Site</h3>
             <a href="/about" data-i18n="footer.about">About</a>
+            <a href="/sitemap" data-i18n="footer.sitemap">HTML Sitemap</a>
             <a href="/privacy" data-i18n="footer.privacy">Privacy policy</a>
             <a href="/terms" data-i18n="footer.terms">Terms of use</a>
           </div>

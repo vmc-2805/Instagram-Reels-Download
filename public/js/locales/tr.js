@@ -13,6 +13,7 @@ window.__locales.tr = {
     photo_dl: 'Fotoğraf indirici',
     site: 'Site',
     about: 'Hakkında',
+    sitemap: 'HTML Site Haritası',
     privacy: 'Gizlilik politikası',
     terms: 'Kullanım koşulları',
     copy: 'Instagram veya Meta Platforms, Inc. ile bağlantılı, onaylanan veya sponsorlu değildir.',
@@ -169,6 +170,12 @@ window.__locales.tr = {
     'availability.text': 'Hizmet olduğu gibi, herhangi bir garanti olmaksızın sunulmaktadır. Instagram sistemlerini istediği zaman değiştirebilir ve özellikler haber verilmeden bozulabilir veya ortadan kalkabilir.',
     'liability.title': 'Sorumluluk',
     'liability.text': 'Yasağın izin verdiği ölçüde, bu sitenin kullanımından kaynaklanan herhangi bir kayıp için sorumluluk kabul etmiyoruz.',
+  },
+  sitemap: {
+    title: 'HTML Site Haritası',
+    desc: 'Bu sitenin tüm sayfaları tek bir yerde. Tüm indiriciler ve bilgi sayfalarına göz atın.',
+    downloaders: 'İndiriciler',
+    info: 'Bilgi',
   },
   error: {
     eyebrow: '404',

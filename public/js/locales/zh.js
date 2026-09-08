@@ -13,6 +13,7 @@ window.__locales.zh = {
     photo_dl: '图片下载器',
     site: '网站',
     about: '关于',
+    sitemap: 'HTML 站点地图',
     privacy: '隐私政策',
     terms: '使用条款',
     copy: '本工具与 Instagram 或 Meta Platforms, Inc. 无关联、无背书、无赞助关系。',
@@ -169,6 +170,12 @@ window.__locales.zh = {
     'availability.text': '本服务按"原样"提供，不附带任何明示或暗示的保证。Instagram 可能随时更改其系统，功能可能会在无通知的情况下失效或消失。',
     'liability.title': '责任',
     'liability.text': '在法律允许的最大范围内，我们对因使用本网站而产生的任何损失不承担责任。',
+  },
+  sitemap: {
+    title: 'HTML 站点地图',
+    desc: '此站点的所有页面都在一处。浏览所有下载器和信息页面。',
+    downloaders: '下载器',
+    info: '信息',
   },
   error: {
     eyebrow: '404',

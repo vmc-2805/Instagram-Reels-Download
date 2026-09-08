@@ -13,6 +13,7 @@ window.__locales.id = {
     photo_dl: 'Pengunduh foto',
     site: 'Situs',
     about: 'Tentang',
+    sitemap: 'Peta situs HTML',
     privacy: 'Kebijakan privasi',
     terms: 'Syarat penggunaan',
     copy: 'Tidak berafiliasi, tidak disponsori, atau tidak didukung oleh Instagram atau Meta Platforms, Inc.',
@@ -169,6 +170,12 @@ window.__locales.id = {
     'availability.text': 'Layanan disediakan apa adanya, tanpa jaminan apa pun. Instagram dapat mengubah sistemnya kapan saja, dan fitur dapat rusak atau hilang tanpa pemberitahuan.',
     'liability.title': 'Tanggung jawab',
     'liability.text': 'Sejauh diizinkan oleh hukum, kami tidak bertanggung jawab atas kerugian apa pun yang timbul dari penggunaan situs ini.',
+  },
+  sitemap: {
+    title: 'Peta situs HTML',
+    desc: 'Semua halaman situs ini dalam satu tempat. Jelajahi semua pengunduh dan halaman informasi.',
+    downloaders: 'Pengunduh',
+    info: 'Informasi',
   },
   error: {
     eyebrow: '404',

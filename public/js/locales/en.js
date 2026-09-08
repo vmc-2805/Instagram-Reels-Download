@@ -13,6 +13,7 @@ window.__locales.en = {
     photo_dl: 'Photo downloader',
     site: 'Site',
     about: 'About',
+    sitemap: 'HTML Sitemap',
     privacy: 'Privacy policy',
     terms: 'Terms of use',
     copy: 'Not affiliated with, endorsed by or sponsored by Instagram or Meta Platforms, Inc.',
@@ -169,6 +170,12 @@ window.__locales.en = {
     'availability.text': 'The service is provided as is, without warranty of any kind. Instagram can change its systems at any time, and features may break or disappear without notice.',
     'liability.title': 'Liability',
     'liability.text': 'To the extent permitted by law, we accept no liability for any loss arising from use of this site.',
+  },
+  sitemap: {
+    title: 'HTML Sitemap',
+    desc: 'All pages of this site in one place. Browse every downloader and information page.',
+    downloaders: 'Downloaders',
+    info: 'Information',
   },
   error: {
     eyebrow: '404',

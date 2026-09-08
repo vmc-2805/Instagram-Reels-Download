@@ -53,6 +53,7 @@ app.get('/photo', (req, res) => html(res, pages.photo()));
 app.get('/about', (req, res) => html(res, pages.about()));
 app.get('/privacy', (req, res) => html(res, pages.privacy()));
 app.get('/terms', (req, res) => html(res, pages.terms()));
+app.get('/sitemap', (req, res) => html(res, pages.sitemap()));
 
 app.get('/llms.txt', (req, res) => {
   res
@@ -70,6 +71,7 @@ app.get('/llms.txt', (req, res) => {
 - Home (Video Downloader): ${config.siteUrl}/
 - Reels Audio to MP3: ${config.siteUrl}/audio
 - Photo Downloader: ${config.siteUrl}/photo
+- HTML Sitemap: ${config.siteUrl}/sitemap
 - About: ${config.siteUrl}/about
 - Privacy Policy: ${config.siteUrl}/privacy
 - Terms of Use: ${config.siteUrl}/terms
@@ -112,11 +114,12 @@ User-agent: Applebot-Extended
 Allow: /
 
 Sitemap: ${config.siteUrl}/sitemap.xml
+LLMs.txt: ${config.siteUrl}/llms.txt
 `);
 });
 
 app.get('/sitemap.xml', (req, res) => {
-  const routes = ['/', '/audio', '/photo', '/about', '/privacy', '/terms'];
+  const routes = ['/', '/audio', '/photo', '/about', '/privacy', '/terms', '/sitemap'];
   const urls = routes
     .map(
       (route) =>

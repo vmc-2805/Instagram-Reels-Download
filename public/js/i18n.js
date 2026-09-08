@@ -235,7 +235,7 @@
           bn: 'গোপনীয়ता नीति | InstaSaver ইনস্টাগ্রাম ডাউনলোডার',
           ur: 'رازداری کی پالیسی | InstaSaver انسٹاگرام ڈاؤنلوڈر',
         },
-        '/terms': {
+'/terms': {
           en: 'Terms of Use | InstaSaver Instagram Downloader',
           es: 'Términos de uso | InstaSaver Instagram Downloader',
           pt: 'Termos de Uso | InstaSaver Instagram Downloader',
@@ -254,8 +254,30 @@
           nl: 'Gebruiksvoorwaarden | InstaSaver Instagram Downloader',
           pl: 'Warunki korzystania | InstaSaver Instagram Downloader',
           id: 'Syarat Penggunaan | Pengunduh Instagram InstaSaver',
-          bn: '사용ের শর্তাবলী | InstaSaver ইনস্টাগ্রাম ডাউনলোডার',
+          bn: '사용의 শর্তাবলী | InstaSaver ইনস্টাগ্রাম ডাউনলোডার',
           ur: 'استعمال کی شرائط | InstaSaver انسٹاگرام ڈاؤنلوڈر',
+        },
+        '/sitemap': {
+          en: 'HTML Sitemap | InstaSaver Instagram Downloader',
+          es: 'Mapa del sitio HTML | InstaSaver Instagram Downloader',
+          pt: 'Mapa do site HTML | InstaSaver Instagram Downloader',
+          fr: 'Plan du site HTML | InstaSaver Instagram Downloader',
+          de: 'HTML-Sitemap | InstaSaver Instagram Downloader',
+          hi: 'HTML साइटमैप | InstaSaver इंस्टाग्राम डाउनलोडर',
+          ar: 'خريطة الموقع HTML | تحميل من انستقرام InstaSaver',
+          zh: 'HTML 站点地图 | InstaSaver Instagram 下载器',
+          ja: 'HTML サイトマップ | InstaSaver Instagramダウンロード',
+          ko: 'HTML 사이트맵 | InstaSaver 인스타그램 다운로더',
+          ru: 'HTML карта сайта | InstaSaver загрузчик',
+          it: 'Mappa del sito HTML | InstaSaver Instagram Downloader',
+          tr: 'HTML Site Haritası | InstaSaver Instagram İndirici',
+          vi: 'Sơ đồ trang HTML | Trình tải Instagram InstaSaver',
+          th: 'แผนผังเว็บไซต์ HTML | ตัวดาวน์โหลด Instagram InstaSaver',
+          nl: 'HTML-sitemap | InstaSaver Instagram Downloader',
+          pl: 'Mapa witryny HTML | InstaSaver Instagram Downloader',
+          id: 'Peta situs HTML | Pengunduh Instagram InstaSaver',
+          bn: 'HTML সাইটম্যাপ | InstaSaver ইনস্টাগ্রাম ডাউনলোডার',
+          ur: 'HTML سائٹ میپ | InstaSaver انسٹاگرام ڈاؤنلوڈر',
         }
       };
 

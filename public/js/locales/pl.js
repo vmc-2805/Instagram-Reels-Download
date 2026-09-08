@@ -13,6 +13,7 @@ window.__locales.pl = {
     photo_dl: 'Pobieracz zdjęć',
     site: 'Strona',
     about: 'O nas',
+    sitemap: 'Mapa witryny HTML',
     privacy: 'Polityka prywatności',
     terms: 'Regulamin',
     copy: 'Nie jesteśmy powiązani, wspierani ani sponsorowani przez Instagram ani Meta Platforms, Inc.',
@@ -169,6 +170,12 @@ window.__locales.pl = {
     'availability.text': 'Usługa jest udostępniana tak jak jest, bez jakiejkolwiek gwarancji. Instagram może w każdej chwili zmienić swoje systemy, a funkcje mogą przestać działać lub zniknąć bez powiadomienia.',
     'liability.title': 'Odpowiedzialność',
     'liability.text': 'W zakresie dozwolonym przez prawo nie ponosimy odpowiedzialności za jakiekolwiek straty wynikające z korzystania z tej strony.',
+  },
+  sitemap: {
+    title: 'Mapa witryny HTML',
+    desc: 'Wszystkie strony tej witryny w jednym miejscu. Przeglądaj wszystkie pobieraki i strony informacyjne.',
+    downloaders: 'Pobieraki',
+    info: 'Informacje',
   },
   error: {
     eyebrow: '404',

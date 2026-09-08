@@ -13,6 +13,7 @@ window.__locales.ko = {
     photo_dl: '사진 다운로더',
     site: '사이트',
     about: '소개',
+    sitemap: 'HTML 사이트맵',
     privacy: '개인정보 처리방침',
     terms: '이용약관',
     copy: 'Instagram 또는 Meta Platforms, Inc.와 제휴, 보증 또는 후원 관계가 아닙니다.',
@@ -169,6 +170,12 @@ window.__locales.ko = {
     'availability.text': '서비스는 어떠한 보증도 없이 있는 그대로 제공됩니다. 인스타그램은 언제든지 시스템을 변경할 수 있으며, 기능이 고장 나거나 공지 없이 사라질 수 있습니다.',
     'liability.title': '책임',
     'liability.text': '법률이 허용하는 범위 내에서, 이 사이트 사용으로 인해 발생하는 어떤 손실에 대해서도 책임을 지지 않습니다.',
+  },
+  sitemap: {
+    title: 'HTML 사이트맵',
+    desc: '이 사이트의 모든 페이지를 한곳에 모았습니다. 모든 다운로더 및 정보 페이지를 둘러보세요.',
+    downloaders: '다운로더',
+    info: '정보',
   },
   error: {
     eyebrow: '404',

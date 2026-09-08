@@ -13,6 +13,7 @@ window.__locales.ja = {
     photo_dl: '写真ダウンローダー',
     site: 'サイト',
     about: '概要',
+    sitemap: 'HTML サイトマップ',
     privacy: 'プライバシーポリシー',
     terms: '利用規約',
     copy: 'InstagramまたはMeta Platforms, Inc.とは提携、認可、またはスポンサー関係にありません。',
@@ -169,6 +170,12 @@ window.__locales.ja = {
     'availability.text': 'サービスはいかなる保証もなく現状のまま提供されます。Instagramはいつでもシステムを変更する可能性があり、機能は通知なしに破損または消失する場合があります。',
     'liability.title': '免責事項',
     'liability.text': '法律で許可される範囲で、このサイトの使用により生じる損害について一切の責任を負いません。',
+  },
+  sitemap: {
+    title: 'HTML サイトマップ',
+    desc: 'このサイトのすべてのページを一か所にまとめました。すべてのダウンローダーと情報ページをご覧ください。',
+    downloaders: 'ダウンローダー',
+    info: '情報',
   },
   error: {
     eyebrow: '404',

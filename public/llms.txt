@@ -29,6 +29,7 @@
 - [Home (Video Downloader)](https://igreelssave.com/): Download Instagram videos and reels
 - [Reels Audio to MP3](https://igreelssave.com/audio): Extract reel audio as MP3
 - [Photo Downloader](https://igreelssave.com/photo): Download photos and carousels
+- [HTML Sitemap](https://igreelssave.com/sitemap): Browse every page of the site
 - [About](https://igreelssave.com/about): Learn how InstaSaver works
 - [Privacy Policy](https://igreelssave.com/privacy): Data and privacy handling
 - [Terms of Use](https://igreelssave.com/terms): Terms and conditions

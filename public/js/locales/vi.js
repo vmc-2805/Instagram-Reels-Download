@@ -13,6 +13,7 @@ window.__locales.vi = {
     photo_dl: 'Tải ảnh',
     site: 'Trang web',
     about: 'Giới thiệu',
+    sitemap: 'Sơ đồ trang HTML',
     privacy: 'Chính sách bảo mật',
     terms: 'Điều khoản sử dụng',
     copy: 'Không liên kết, không được xác nhận hoặc tài trợ bởi Instagram hay Meta Platforms, Inc.',
@@ -169,6 +170,12 @@ window.__locales.vi = {
     'availability.text': 'Dịch vụ được cung cấp nguyên trạng, không có bảo đảm dưới bất kỳ hình thức nào. Instagram có thể thay đổi hệ thống bất cứ lúc nào, và các tính năng có thể bị hỏng hoặc biến mất mà không thông báo.',
     'liability.title': 'Trách nhiệm pháp lý',
     'liability.text': 'Trong phạm vi luật pháp cho phép, chúng tôi không chịu trách nhiệm cho bất kỳ tổn thất nào phát sinh từ việc sử dụng trang web này.',
+  },
+  sitemap: {
+    title: 'Sơ đồ trang HTML',
+    desc: 'Tất cả các trang của trang web này tại một nơi. Duyệt qua tất cả các trình tải xuống và trang thông tin.',
+    downloaders: 'Trình tải xuống',
+    info: 'Thông tin',
   },
   error: {
     eyebrow: '404',

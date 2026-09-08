@@ -13,6 +13,7 @@ window.__locales.de = {
     photo_dl: 'Foto-Downloader',
     site: 'Seite',
     about: 'Über uns',
+    sitemap: 'HTML-Sitemap',
     privacy: 'Datenschutzerklärung',
     terms: 'Nutzungsbedingungen',
     copy: 'Nicht verbunden mit, unterstützt von oder gesponsert von Instagram oder Meta Platforms, Inc.',
@@ -169,6 +170,12 @@ window.__locales.de = {
     'availability.text': 'Der Service wird so bereitgestellt, wie er ist, ohne jegliche Garantie. Instagram kann seine Systeme jederzeit ändern, und Funktionen können ohne Vorwarnung ausfallen oder verschwinden.',
     'liability.title': 'Haftung',
     'liability.text': 'Im gesetzlich zulässigen Umfang übernehmen wir keine Haftung für Verluste, die sich aus der Nutzung dieser Seite ergeben.',
+  },
+  sitemap: {
+    title: 'HTML-Sitemap',
+    desc: 'Alle Seiten dieser Website an einem Ort. Stöbern Sie durch alle Downloader und Informationsseiten.',
+    downloaders: 'Downloader',
+    info: 'Informationen',
   },
   error: {
     eyebrow: '404',

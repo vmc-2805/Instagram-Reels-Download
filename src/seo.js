@@ -146,6 +146,25 @@ const seoConfig = {
       }
     ]
   },
+  '/sitemap': {
+    title: 'HTML Sitemap | InstaSaver Instagram Downloader',
+    description: 'Browse every page of InstaSaver — Instagram video, reel, photo and audio downloaders, plus about, privacy and terms pages.',
+    robots: 'index, follow, max-image-preview:large',
+    ogImage: '/og-image.png',
+    breadcrumbs: [
+      { name: 'Home', item: '/', key: 'seo.bread.home' },
+      { name: 'HTML Sitemap', item: '/sitemap', key: 'sitemap.title' }
+    ],
+    schema: (url) => [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'SiteNavigationElement',
+        '@id': `${config.siteUrl}/sitemap#sitemap`,
+        'name': `HTML Sitemap | ${config.siteName}`,
+        'url': url
+      }
+    ]
+  },
   '404': {
     title: 'Page Not Found | InstaSaver',
     description: 'The requested page was not found on InstaSaver. Go back to our free Instagram video, reel, and photo downloader.',
