@@ -28,12 +28,12 @@ async function sendTelegramAlert(message) {
     if (!res.ok) {
       const text = await res.text();
       console.error('[telegram]', 'Telegram API error:', res.status, text);
-      return `Telegram API returned ${res.status}: ${text}`;
+      return false;
     }
     return true;
   } catch (error) {
     console.error('[telegram]', 'Failed to send alert:', error.message);
-    return `Network error: ${error.message}`;
+    return false;
   }
 }
 
