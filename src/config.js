@@ -64,4 +64,6 @@ module.exports = {
   instadlBrowser: process.env.INSTADL_BROWSER || '',
   googleAnalytics: process.env.GOOGLE_ANALYTICS_ID || '',
   searchConsole: process.env.GOOGLE_SEARCH_CONSOLE || '',
+  telegramBotToken: process.env.TELEGRAM_BOT_TOKEN || '',
+  telegramChatId: process.env.TELEGRAM_CHAT_ID || '',
 };

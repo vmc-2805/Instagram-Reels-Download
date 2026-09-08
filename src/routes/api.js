@@ -6,6 +6,7 @@ const { request, baseHeaders } = require('../lib/http');
 const { createRateLimiter } = require('../lib/ratelimit');
 const { resolve, ResolveError } = require('../lib/instagram');
 const audio = require('../lib/audio');
+const { sendTelegramAlert } = require('../lib/telegram');
 
 const router = express.Router();
 
@@ -46,6 +47,14 @@ router.post('/fetch', limiter, express.json({ limit: '8kb' }), async (req, res) 
   try {
     const result = await resolve(input);
 
+    if (String(input || '').includes('/reel/') || String(input || '').includes('/reels/')) {
+      const hasVideo = result.media.some(m => m.type === 'video');
+      if (!hasVideo) {
+        const safeUrl = String(input || 'unknown').length > 500 ? String(input).slice(0, 500) + '... (truncated)' : (input || 'unknown');
+        sendTelegramAlert(`[Warning: Reel without Video]\nURL: ${safeUrl}\nInstagram returned only an image for this Reel. Session cookie might be partially blocked.`).catch(console.error);
+      }
+    }
+
     res.json({
       ok: true,
       data: {
@@ -83,10 +92,14 @@ router.post('/fetch', limiter, express.json({ limit: '8kb' }), async (req, res) 
     });
   } catch (error) {
     const status = error instanceof ResolveError ? error.status : 500;
-    if (status >= 500) console.error('[api/fetch]', error);
+    if (status >= 500) {
+      console.error('[api/fetch]', error);
+      const safeUrl = String(input || 'unknown').length > 500 ? String(input).slice(0, 500) + '... (truncated)' : (input || 'unknown');
+      sendTelegramAlert(`[Fetch Error]\nURL: ${safeUrl}\nError: ${error.message}`);
+    }
     res.status(status).json({
       ok: false,
-      error: error instanceof ResolveError ? error.message : 'Something went wrong. Try again.',
+      error: status >= 500 ? 'Something went wrong. Please try again later.' : (error instanceof ResolveError ? error.message : 'Something went wrong. Try again.'),
     });
   }
 });
@@ -127,10 +140,14 @@ router.get('/download', async (req, res) => {
     Readable.fromWeb(upstream.body).pipe(res);
   } catch (error) {
     const status = error instanceof ResolveError ? error.status : 500;
-    if (status >= 500) console.error('[api/download]', error);
+    if (status >= 500) {
+      console.error('[api/download]', error);
+      const safeUrl = String(req.query.u || 'unknown').length > 500 ? String(req.query.u).slice(0, 500) + '... (truncated)' : (req.query.u || 'unknown');
+      sendTelegramAlert(`[Download Error]\nURL: ${safeUrl}\nError: ${error.message}`);
+    }
     res.status(status).json({
       ok: false,
-      error: error instanceof ResolveError ? error.message : 'Download failed.',
+      error: status >= 500 ? 'Something went wrong. Please try again later.' : (error instanceof ResolveError ? error.message : 'Download failed.'),
     });
   }
 });
@@ -161,10 +178,14 @@ router.get('/audio', async (req, res) => {
     });
   } catch (error) {
     const status = error instanceof ResolveError ? error.status : 500;
-    if (status >= 500) console.error('[api/audio]', error);
+    if (status >= 500) {
+      console.error('[api/audio]', error);
+      const safeUrl = String(req.query.u || 'unknown').length > 500 ? String(req.query.u).slice(0, 500) + '... (truncated)' : (req.query.u || 'unknown');
+      sendTelegramAlert(`[Audio Error]\nURL: ${safeUrl}\nError: ${error.message}`);
+    }
     res.status(status).json({
       ok: false,
-      error: error instanceof ResolveError ? error.message : 'Audio extraction failed.',
+      error: status >= 500 ? 'Something went wrong. Please try again later.' : (error instanceof ResolveError ? error.message : 'Audio extraction failed.'),
     });
   }
 });
