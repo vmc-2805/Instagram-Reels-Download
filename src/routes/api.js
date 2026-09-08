@@ -92,9 +92,11 @@ router.post('/fetch', limiter, express.json({ limit: '8kb' }), async (req, res) 
     });
   } catch (error) {
     const status = error instanceof ResolveError ? error.status : 500;
-    console.error('[api/fetch]', error);
-    const safeUrl = String(input || 'unknown').length > 500 ? String(input).slice(0, 500) + '... (truncated)' : (input || 'unknown');
-    sendTelegramAlert(`[Fetch Error]\nURL: ${safeUrl}\nError: ${error.message}`);
+    if (status >= 500) {
+      console.error('[api/fetch]', error);
+      const safeUrl = String(input || 'unknown').length > 500 ? String(input).slice(0, 500) + '... (truncated)' : (input || 'unknown');
+      sendTelegramAlert(`[Fetch Error]\nURL: ${safeUrl}\nError: ${error.message}`);
+    }
     res.status(status).json({
       ok: false,
       error: status >= 500 ? 'Something went wrong. Please try again later.' : (error instanceof ResolveError ? error.message : 'Something went wrong. Try again.'),

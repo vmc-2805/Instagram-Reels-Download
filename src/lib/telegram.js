@@ -7,8 +7,10 @@ async function sendTelegramAlert(message) {
   const { telegramBotToken, telegramChatId } = config;
 
   if (!telegramBotToken || !telegramChatId) {
+    console.log('[telegram] value get false - Telegram token or chat ID is missing in env!');
     return; // Silently ignore if Telegram is not configured
   }
+  console.log('[telegram] value get true - Token and Chat ID found!');
 
   const url = `https://api.telegram.org/bot${telegramBotToken}/sendMessage`;
   
