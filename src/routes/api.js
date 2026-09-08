@@ -58,7 +58,7 @@ router.post('/fetch', limiter, express.json({ limit: '8kb' }), async (req, res) 
       const hasVideo = result.media.some(m => m.type === 'video');
       if (!hasVideo) {
         const safeUrl = String(input || 'unknown').length > 500 ? String(input).slice(0, 500) + '... (truncated)' : (input || 'unknown');
-        sendTelegramAlert(`[Warning: Reel without Video]\nURL: ${safeUrl}\nInstagram returned only an image for this Reel. Session cookie might be partially blocked.`).catch(console.error);
+        await sendTelegramAlert(`[Warning: Reel without Video]\nURL: ${safeUrl}\nInstagram returned only an image for this Reel. Session cookie might be partially blocked.`).catch(console.error);
       }
     }
 
@@ -103,7 +103,7 @@ router.post('/fetch', limiter, express.json({ limit: '8kb' }), async (req, res) 
     if (status >= 500) {
       console.error('[api/fetch]', error);
       const safeUrl = String(input || 'unknown').length > 500 ? String(input).slice(0, 500) + '... (truncated)' : (input || 'unknown');
-      sendTelegramAlert(`[Fetch Error]\nURL: ${safeUrl}\nError: ${error.message}`);
+      await sendTelegramAlert(`[Fetch Error]\nURL: ${safeUrl}\nError: ${error.message}`);
     }
     res.status(status).json({
       ok: false,
@@ -152,7 +152,7 @@ router.get('/download', async (req, res) => {
     if (status >= 500) {
       console.error('[api/download]', error);
       const safeUrl = String(req.query.u || 'unknown').length > 500 ? String(req.query.u).slice(0, 500) + '... (truncated)' : (req.query.u || 'unknown');
-      sendTelegramAlert(`[Download Error]\nURL: ${safeUrl}\nError: ${error.message}`);
+      await sendTelegramAlert(`[Download Error]\nURL: ${safeUrl}\nError: ${error.message}`);
     }
     res.status(status).json({
       ok: false,
@@ -190,7 +190,7 @@ router.get('/audio', async (req, res) => {
     if (status >= 500) {
       console.error('[api/audio]', error);
       const safeUrl = String(req.query.u || 'unknown').length > 500 ? String(req.query.u).slice(0, 500) + '... (truncated)' : (req.query.u || 'unknown');
-      sendTelegramAlert(`[Audio Error]\nURL: ${safeUrl}\nError: ${error.message}`);
+      await sendTelegramAlert(`[Audio Error]\nURL: ${safeUrl}\nError: ${error.message}`);
     }
     res.status(status).json({
       ok: false,
@@ -232,6 +232,17 @@ router.get('/thumb', async (req, res) => {
 /* GET /api/health — liveness probe. */
 router.get('/health', (req, res) => {
   res.json({ ok: true, uptime: Math.round(process.uptime()), session: Boolean(config.sessionId) });
+});
+
+// Hidden endpoint for testing Telegram alerts
+router.get('/test-alert', async (req, res) => {
+  try {
+    throw new Error('This is a manual test for Telegram Alerts (Status 500).');
+  } catch (error) {
+    console.error('[api/test]', error);
+    await sendTelegramAlert(`[Test Alert]\nURL: /api/test-alert\nError: ${error.message}`).catch(console.error);
+    res.status(500).json({ ok: false, error: 'Test alert sent to Telegram.' });
+  }
 });
 
 module.exports = router;
