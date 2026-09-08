@@ -225,37 +225,4 @@ router.get('/health', (req, res) => {
   res.json({ ok: true, uptime: Math.round(process.uptime()), session: Boolean(config.sessionId) });
 });
 
-// Diagnostic endpoint to test Telegram connectivity and return raw API response
-router.get('/force-telegram', async (req, res) => {
-  const config = require('../config');
-  const { telegramBotToken, telegramChatId } = config;
-  
-  if (!telegramBotToken || !telegramChatId) {
-    return res.json({ success: false, error: 'Tokens are missing in Vercel env!' });
-  }
-
-  const url = `https://api.telegram.org/bot${String(telegramBotToken).trim()}/sendMessage`;
-  
-  try {
-    const telegramRes = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: String(telegramChatId).trim(),
-        text: '✅ Hello! This is a test message directly from your LIVE Vercel server!',
-      })
-    });
-    
-    const data = await telegramRes.json();
-    return res.json({ 
-      success: telegramRes.ok, 
-      telegram_response: data,
-      bot_token_length: telegramBotToken.length,
-      chat_id: telegramChatId
-    });
-  } catch (err) {
-    return res.json({ success: false, error: err.message });
-  }
-});
-
 module.exports = router;
