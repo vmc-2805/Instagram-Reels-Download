@@ -7,7 +7,7 @@ async function sendTelegramAlert(message) {
   const { telegramBotToken, telegramChatId } = config;
 
   if (!telegramBotToken || !telegramChatId) {
-    return; // Silently ignore if Telegram is not configured
+    return 'Missing Telegram Bot Token or Chat ID in .env';
   }
 
   const url = `https://api.telegram.org/bot${telegramBotToken}/sendMessage`;
@@ -28,9 +28,12 @@ async function sendTelegramAlert(message) {
     if (!res.ok) {
       const text = await res.text();
       console.error('[telegram]', 'Telegram API error:', res.status, text);
+      return `Telegram API returned ${res.status}: ${text}`;
     }
+    return true;
   } catch (error) {
     console.error('[telegram]', 'Failed to send alert:', error.message);
+    return `Network error: ${error.message}`;
   }
 }
 

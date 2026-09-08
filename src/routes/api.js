@@ -95,7 +95,10 @@ router.post('/fetch', limiter, express.json({ limit: '8kb' }), async (req, res) 
     if (status >= 500 || status === 429) {
       console.error('[api/fetch]', error);
       const safeUrl = String(input || 'unknown').length > 500 ? String(input).slice(0, 500) + '... (truncated)' : (input || 'unknown');
-      await sendTelegramAlert(`[Fetch Error]\nURL: ${safeUrl}\nError: ${error.message}`);
+      const telegramResult = await sendTelegramAlert(`[Fetch Error]\nURL: ${safeUrl}\nError: ${error.message}`);
+      if (telegramResult !== true) {
+        return res.status(status).json({ ok: false, error: `Telegram Alert Failed: ${telegramResult}` });
+      }
     }
     res.status(status).json({
       ok: false,
@@ -143,7 +146,10 @@ router.get('/download', async (req, res) => {
     if (status >= 500 || status === 429) {
       console.error('[api/download]', error);
       const safeUrl = String(req.query.u || 'unknown').length > 500 ? String(req.query.u).slice(0, 500) + '... (truncated)' : (req.query.u || 'unknown');
-      await sendTelegramAlert(`[Download Error]\nURL: ${safeUrl}\nError: ${error.message}`);
+      const telegramResult = await sendTelegramAlert(`[Download Error]\nURL: ${safeUrl}\nError: ${error.message}`);
+      if (telegramResult !== true) {
+        return res.status(status).json({ ok: false, error: `Telegram Alert Failed: ${telegramResult}` });
+      }
     }
     res.status(status).json({
       ok: false,
@@ -181,7 +187,10 @@ router.get('/audio', async (req, res) => {
     if (status >= 500 || status === 429) {
       console.error('[api/audio]', error);
       const safeUrl = String(req.query.u || 'unknown').length > 500 ? String(req.query.u).slice(0, 500) + '... (truncated)' : (req.query.u || 'unknown');
-      await sendTelegramAlert(`[Audio Error]\nURL: ${safeUrl}\nError: ${error.message}`);
+      const telegramResult = await sendTelegramAlert(`[Audio Error]\nURL: ${safeUrl}\nError: ${error.message}`);
+      if (telegramResult !== true) {
+        return res.status(status).json({ ok: false, error: `Telegram Alert Failed: ${telegramResult}` });
+      }
     }
     res.status(status).json({
       ok: false,
