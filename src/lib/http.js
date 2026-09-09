@@ -14,29 +14,31 @@ const IG_APP_ID = '936619743392459';
 const guestCookies = new Map();
 let guestBootstrap = null;
 
-function cookieHeader() {
+function cookieHeader(session = null) {
   const jar = new Map(guestCookies);
-  if (config.sessionId) jar.set('sessionid', config.sessionId);
-  if (config.csrfToken) jar.set('csrftoken', config.csrfToken);
+  const activeSessionId = session?.sessionId ?? config.sessionId;
+  const activeCsrfToken = session?.csrfToken ?? config.csrfToken;
+  if (activeSessionId) jar.set('sessionid', activeSessionId);
+  if (activeCsrfToken) jar.set('csrftoken', activeCsrfToken);
   return [...jar].map(([name, value]) => `${name}=${value}`).join('; ');
 }
 
-function currentCsrfToken() {
-  return config.csrfToken || guestCookies.get('csrftoken') || 'missing';
+function currentCsrfToken(session = null) {
+  return session?.csrfToken || config.csrfToken || guestCookies.get('csrftoken') || 'missing';
 }
 
-function baseHeaders(extra = {}) {
+function baseHeaders(extra = {}, session = null) {
   const headers = {
     'User-Agent': DESKTOP_UA,
     'Accept-Language': 'en-US,en;q=0.9',
     'Sec-Fetch-Site': 'same-origin',
     'X-ASBD-ID': '129477',
     'X-IG-WWW-Claim': '0',
-    'X-CSRFToken': currentCsrfToken(),
+    'X-CSRFToken': currentCsrfToken(session),
     ...extra,
   };
 
-  const cookie = cookieHeader();
+  const cookie = cookieHeader(session);
   if (cookie) headers.Cookie = cookie;
   return headers;
 }
@@ -85,8 +87,9 @@ async function request(url, options = {}) {
   }
 }
 
-async function getText(url, headers = {}) {
-  const res = await request(url, { headers: baseHeaders(headers) });
+async function getText(url, headers = {}, options = {}) {
+  const { session, ...rest } = options;
+  const res = await request(url, { headers: baseHeaders(headers, session), ...rest });
   if (!res.ok) {
     const err = new Error(`Upstream responded with ${res.status}`);
     err.status = res.status;
@@ -95,9 +98,11 @@ async function getText(url, headers = {}) {
   return res.text();
 }
 
-async function getJson(url, headers = {}) {
+async function getJson(url, headers = {}, options = {}) {
+  const { session, ...rest } = options;
   const res = await request(url, {
-    headers: baseHeaders({ 'X-IG-App-ID': IG_APP_ID, Accept: '*/*', ...headers }),
+    headers: baseHeaders({ 'X-IG-App-ID': IG_APP_ID, Accept: '*/*', ...headers }, session),
+    ...rest,
   });
 
   if (!res.ok) {
@@ -107,14 +112,30 @@ async function getJson(url, headers = {}) {
   }
 
   const body = await res.text();
+  let json;
   try {
-    return JSON.parse(body);
+    json = JSON.parse(body);
   } catch {
     // Instagram serves an HTML login wall instead of JSON when it blocks us.
     const err = new Error('Instagram returned a non-JSON response (login wall or block).');
     err.status = 403;
     throw err;
   }
+
+  if (json?.status === 'fail') {
+    const msg = json.message || 'Instagram API status fail';
+    const err = new Error(msg);
+    if (/login_required|checkpoint/i.test(msg)) {
+      err.status = 401;
+    } else if (/rate_limit/i.test(msg)) {
+      err.status = 429;
+    } else {
+      err.status = 400;
+    }
+    throw err;
+  }
+
+  return json;
 }
 
 module.exports = {

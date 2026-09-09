@@ -34,12 +34,54 @@ const toInt = (value, fallback) => {
   return Number.isFinite(n) ? n : fallback;
 };
 
+function parseSessions() {
+  const list = [];
+
+  if (process.env.IG_SESSIONID) {
+    const rawSessions = process.env.IG_SESSIONID.split(/[,;\r\n]+/)
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    for (let j = 0; j < rawSessions.length; j += 1) {
+      const sId = rawSessions[j];
+      if (!list.some((s) => s.sessionId === sId)) {
+        list.push({
+          id: `session_${list.length + 1}`,
+          index: list.length + 1,
+          sessionId: sId,
+          csrfToken: (process.env.IG_CSRFTOKEN || '').trim(),
+        });
+      }
+    }
+  }
+
+  let i = 1;
+  while (process.env[`IG_SESSIONID_${i}`] !== undefined) {
+    const sId = (process.env[`IG_SESSIONID_${i}`] || '').trim();
+    if (sId && !list.some((s) => s.sessionId === sId)) {
+      const cToken = (process.env[`IG_CSRFTOKEN_${i}`] || process.env.IG_CSRFTOKEN || '').trim();
+      list.push({
+        id: `session_${list.length + 1}`,
+        index: list.length + 1,
+        sessionId: sId,
+        csrfToken: cToken,
+      });
+    }
+    i += 1;
+  }
+
+  return list;
+}
+
+const sessions = parseSessions();
+
 module.exports = {
   port: toInt(process.env.PORT, 3001),
   siteName: process.env.SITE_NAME || 'InstaSaver',
   siteUrl: (process.env.SITE_URL || 'http://localhost:3001').replace(/\/+$/, ''),
-  sessionId: process.env.IG_SESSIONID || '',
-  csrfToken: process.env.IG_CSRFTOKEN || '',
+  sessions,
+  sessionId: sessions[0]?.sessionId || '',
+  csrfToken: sessions[0]?.csrfToken || process.env.IG_CSRFTOKEN || '',
   rateLimitPerMinute: toInt(process.env.RATE_LIMIT_PER_MINUTE, 20),
   cacheTtlMs: toInt(process.env.CACHE_TTL_SECONDS, 900) * 1000,
   // ffmpeg-static ships a working ffmpeg binary inside node_modules, so audio

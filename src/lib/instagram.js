@@ -7,6 +7,96 @@ const ytdlp = require('./ytdlp');
 const provider = require('./provider');
 const instadl = require('./instadl');
 
+class SessionManager {
+  constructor(sessions = []) {
+    this.init(sessions);
+  }
+
+  init(sessions = []) {
+    this.sessions = sessions.map((s) => ({
+      ...s,
+      cooldownUntil: 0,
+      failCount: 0,
+    }));
+  }
+
+  hasSessions() {
+    return this.sessions.length > 0;
+  }
+
+  getAllSessions() {
+    return this.sessions;
+  }
+
+  getOrderedSessions() {
+    if (this.sessions.length === 0) return [null];
+
+    const now = Date.now();
+    const healthy = [];
+    const inCooldown = [];
+
+    for (const session of this.sessions) {
+      if (session.cooldownUntil && session.cooldownUntil > now) {
+        inCooldown.push(session);
+      } else {
+        healthy.push(session);
+      }
+    }
+
+    return [...healthy, ...inCooldown];
+  }
+
+  markSuccess(session) {
+    if (!session) return;
+    const target = this.sessions.find((s) => s.index === session.index);
+    if (target) {
+      target.cooldownUntil = 0;
+      target.failCount = 0;
+    }
+  }
+
+  markFailure(session, error) {
+    if (!session) return;
+    const target = this.sessions.find((s) => s.index === session.index);
+    if (!target) return;
+
+    target.failCount = (target.failCount || 0) + 1;
+
+    const msg = error?.message || '';
+    const status = error?.status;
+    const isAuthOrBlock =
+      status === 401 ||
+      status === 403 ||
+      status === 429 ||
+      /login_required|checkpoint|feedback_required|rate_limit|non-JSON/i.test(msg);
+
+    if (isAuthOrBlock) {
+      target.cooldownUntil = Date.now() + 5 * 60 * 1000;
+      console.warn(
+        `[session-pool] Session ${target.index} blocked or rate-limited (${msg}). Cooling down for 5m.`
+      );
+    }
+  }
+
+  getStatus() {
+    const now = Date.now();
+    return {
+      total: this.sessions.length,
+      sessions: this.sessions.map((s) => ({
+        index: s.index,
+        inCooldown: Boolean(s.cooldownUntil && s.cooldownUntil > now),
+        cooldownRemainingSec:
+          s.cooldownUntil && s.cooldownUntil > now
+            ? Math.round((s.cooldownUntil - now) / 1000)
+            : 0,
+        failCount: s.failCount,
+      })),
+    };
+  }
+}
+
+const sessionManager = new SessionManager(config.sessions || []);
+
 const cache = new TtlCache({ ttlMs: config.cacheTtlMs, maxEntries: 500 });
 
 const SHORTCODE_ALPHABET =
@@ -217,11 +307,13 @@ function normalizeGraphMedia(node) {
  * ------------------------------------------------------------------ */
 
 // 1. Private-ish JSON API used by the web client. Best quality metadata.
-async function viaMobileApi(shortcode) {
+async function viaMobileApi(shortcode, session = null) {
   const mediaId = shortcodeToMediaId(shortcode);
-  const data = await getJson(`https://www.instagram.com/api/v1/media/${mediaId}/info/`, {
-    Referer: `https://www.instagram.com/p/${shortcode}/`,
-  });
+  const data = await getJson(
+    `https://www.instagram.com/api/v1/media/${mediaId}/info/`,
+    { Referer: `https://www.instagram.com/p/${shortcode}/` },
+    { session }
+  );
 
   const item = data?.items?.[0];
   if (!item) throw new ResolveError('No media in API response.', 502);
@@ -229,7 +321,7 @@ async function viaMobileApi(shortcode) {
 }
 
 // 2. The GraphQL document the web app itself posts.
-async function viaGraphql(shortcode) {
+async function viaGraphql(shortcode, session = null) {
   let lastError;
 
   for (const docId of DOC_IDS) {
@@ -247,17 +339,23 @@ async function viaGraphql(shortcode) {
 
       const res = await request('https://www.instagram.com/graphql/query', {
         method: 'POST',
-        headers: baseHeaders({
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'X-IG-App-ID': IG_APP_ID,
-          Referer: `https://www.instagram.com/p/${shortcode}/`,
-        }),
+        headers: baseHeaders(
+          {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-IG-App-ID': IG_APP_ID,
+            Referer: `https://www.instagram.com/p/${shortcode}/`,
+          },
+          session
+        ),
         body,
       });
 
       if (!res.ok) throw new Error(`GraphQL responded with ${res.status}`);
 
       const json = JSON.parse(await res.text());
+      if (json?.status === 'fail' || json?.message === 'login_required' || json?.message === 'checkpoint_required') {
+        throw new Error(`GraphQL: ${json.message || 'status fail'}`);
+      }
       const node = json?.data?.xdt_shortcode_media || json?.data?.shortcode_media;
       if (node) return normalizeGraphMedia(node);
 
@@ -411,19 +509,25 @@ async function resolvePost(shortcode) {
 
   const postUrl = `https://www.instagram.com/p/${shortcode}/`;
 
-  // Ordered cheapest/most accurate first. The optional strategies are skipped
-  // entirely unless they are configured.
-  const strategies = [
-    ['mobile-api', () => viaMobileApi(shortcode)],
-    ['graphql', () => viaGraphql(shortcode)],
-  ];
+  // Ordered cheapest/most accurate first.
+  // We build strategies dynamically across configured sessions (Session 1 -> Session 2 -> Session 3).
+  const strategies = [];
+  const sessions = sessionManager.getOrderedSessions();
+
+  for (const session of sessions) {
+    const label = session ? `session-${session.index}` : 'guest';
+    strategies.push(
+      [`mobile-api (${label})`, () => viaMobileApi(shortcode, session), session],
+      [`graphql (${label})`, () => viaGraphql(shortcode, session), session]
+    );
+  }
 
   if (provider.isConfigured()) {
-    strategies.push(['provider', () => provider.resolveWithProvider(postUrl, shortcode)]);
+    strategies.push(['provider', () => provider.resolveWithProvider(postUrl, shortcode), null]);
   }
 
   if (await ytdlp.isAvailable()) {
-    strategies.push(['yt-dlp', () => ytdlp.resolveWithYtDlp(postUrl, shortcode)]);
+    strategies.push(['yt-dlp', () => ytdlp.resolveWithYtDlp(postUrl, shortcode), null]);
   }
 
   // instadl drives a headless browser through a downloader site to get the
@@ -431,10 +535,13 @@ async function resolvePost(shortcode) {
   // embed/open-graph fallbacks below can only hand back a preview image to
   // anonymous requests), so it runs before those.
   if (await instadl.isAvailable()) {
-    strategies.push(['instadl', () => instadl.resolveWithInstadl(postUrl, shortcode)]);
+    strategies.push(['instadl', () => instadl.resolveWithInstadl(postUrl, shortcode), null]);
   }
 
-  strategies.push(['embed', () => viaEmbed(shortcode)], ['open-graph', () => viaOpenGraph(shortcode)]);
+  strategies.push(
+    ['embed', () => viaEmbed(shortcode), null],
+    ['open-graph', () => viaOpenGraph(shortcode), null]
+  );
 
   const failures = [];
   // Flipped once a strategy has proven the post is a video. From then on a
@@ -442,7 +549,12 @@ async function resolvePost(shortcode) {
   // request must never be answered with a JPG.
   let knownVideo = false;
 
-  for (const [name, strategy] of strategies) {
+  for (const [name, strategy, session] of strategies) {
+    // If this session just got placed in cooldown by a preceding strategy, skip to next session
+    if (session?.cooldownUntil && session.cooldownUntil > Date.now()) {
+      continue;
+    }
+
     try {
       const result = await strategy();
       if (result?.media?.length) {
@@ -450,6 +562,7 @@ async function resolvePost(shortcode) {
           failures.push(`${name}: only the preview image of a video post`);
           continue;
         }
+        if (session) sessionManager.markSuccess(session);
         result.source = name;
         result.postUrl = postUrl;
         // Degraded answers (preview image only, flagged with a warning) are not
@@ -458,6 +571,7 @@ async function resolvePost(shortcode) {
       }
       failures.push(`${name}: empty result`);
     } catch (error) {
+      if (session) sessionManager.markFailure(session, error);
       if (/preview image for this video/i.test(error.message)) knownVideo = true;
       failures.push(`${name}: ${error.message}`);
     }
@@ -486,7 +600,7 @@ async function resolvePost(shortcode) {
 }
 
 async function resolveStory({ username, storyId }) {
-  if (!config.sessionId) {
+  if (!sessionManager.hasSessions() && !config.sessionId) {
     throw new ResolveError(
       'Stories require a logged-in session. Add IG_SESSIONID to your .env file to enable story downloads.',
       501
@@ -497,72 +611,93 @@ async function resolveStory({ username, storyId }) {
   const cached = cache.get(cacheKey);
   if (cached) return cached;
 
-  const profile = await getJson(
-    `https://www.instagram.com/api/v1/users/web_profile_info/?username=${encodeURIComponent(username)}`,
-    { Referer: `https://www.instagram.com/${username}/` }
-  );
+  const sessions = sessionManager.getOrderedSessions();
+  let lastError;
 
-  const userId = profile?.data?.user?.id;
-  if (!userId) throw new ResolveError(`No Instagram account found for @${username}.`, 404);
+  for (const session of sessions) {
+    try {
+      const profile = await getJson(
+        `https://www.instagram.com/api/v1/users/web_profile_info/?username=${encodeURIComponent(username)}`,
+        { Referer: `https://www.instagram.com/${username}/` },
+        { session }
+      );
 
-  const reels = await getJson(
-    `https://www.instagram.com/api/v1/feed/reels_media/?reel_ids=${userId}`,
-    { Referer: `https://www.instagram.com/stories/${username}/` }
-  );
+      const userId = profile?.data?.user?.id;
+      if (!userId) throw new ResolveError(`No Instagram account found for @${username}.`, 404);
 
-  const reel = reels?.reels?.[userId] || reels?.reels_media?.[0];
-  let items = reel?.items || [];
-  if (storyId) items = items.filter((item) => String(item.pk) === String(storyId));
+      const reels = await getJson(
+        `https://www.instagram.com/api/v1/feed/reels_media/?reel_ids=${userId}`,
+        { Referer: `https://www.instagram.com/stories/${username}/` },
+        { session }
+      );
 
-  if (!items.length) {
-    throw new ResolveError(`@${username} has no active stories right now.`, 404);
+      const reel = reels?.reels?.[userId] || reels?.reels_media?.[0];
+      let items = reel?.items || [];
+      if (storyId) items = items.filter((item) => String(item.pk) === String(storyId));
+
+      if (!items.length) {
+        throw new ResolveError(`@${username} has no active stories right now.`, 404);
+      }
+
+      const media = items
+        .map((item) => {
+          const image = pickLargest(item.image_versions2?.candidates || []);
+          const video = pickLargest(item.video_versions || []);
+          if (item.media_type === 2) {
+            if (!video) return null;
+            return {
+              type: 'video',
+              url: video.url,
+              thumbnail: image?.url || '',
+              width: video.width || null,
+              height: video.height || null,
+              duration: item.video_duration ? Math.round(item.video_duration) : null,
+            };
+          }
+          if (!image) return null;
+          return {
+            type: 'image',
+            url: image.url,
+            thumbnail: image.url,
+            width: image.width || null,
+            height: image.height || null,
+            duration: null,
+          };
+        })
+        .filter(Boolean);
+
+      const result = {
+        shortcode: storyId || username,
+        type: 'story',
+        caption: '',
+        owner: {
+          username: reel?.user?.username || username,
+          fullName: reel?.user?.full_name || '',
+          avatar: reel?.user?.profile_pic_url || '',
+        },
+        likes: null,
+        views: null,
+        takenAt: items[0]?.taken_at ? items[0].taken_at * 1000 : null,
+        media,
+        source: 'story-api',
+        postUrl: `https://www.instagram.com/stories/${username}/`,
+      };
+
+      if (session) sessionManager.markSuccess(session);
+      return cache.set(cacheKey, result);
+    } catch (err) {
+      lastError = err;
+      if (session) sessionManager.markFailure(session, err);
+      console.warn(
+        `[story] Session ${session?.index || 'guest'} failed: ${err.message}. Trying next session...`
+      );
+      if (err instanceof ResolveError && err.status === 404) {
+        throw err;
+      }
+    }
   }
 
-  const media = items
-    .map((item) => {
-      const image = pickLargest(item.image_versions2?.candidates || []);
-      const video = pickLargest(item.video_versions || []);
-      if (item.media_type === 2) {
-        if (!video) return null;
-        return {
-          type: 'video',
-          url: video.url,
-          thumbnail: image?.url || '',
-          width: video.width || null,
-          height: video.height || null,
-          duration: item.video_duration ? Math.round(item.video_duration) : null,
-        };
-      }
-      if (!image) return null;
-      return {
-        type: 'image',
-        url: image.url,
-        thumbnail: image.url,
-        width: image.width || null,
-        height: image.height || null,
-        duration: null,
-      };
-    })
-    .filter(Boolean);
-
-  const result = {
-    shortcode: storyId || username,
-    type: 'story',
-    caption: '',
-    owner: {
-      username: reel?.user?.username || username,
-      fullName: reel?.user?.full_name || '',
-      avatar: reel?.user?.profile_pic_url || '',
-    },
-    likes: null,
-    views: null,
-    takenAt: items[0]?.taken_at ? items[0].taken_at * 1000 : null,
-    media,
-    source: 'story-api',
-    postUrl: `https://www.instagram.com/stories/${username}/`,
-  };
-
-  return cache.set(cacheKey, result);
+  throw lastError || new ResolveError('Could not fetch stories with available sessions.', 500);
 }
 
 /** Entry point used by the API route. */
@@ -580,6 +715,7 @@ module.exports = {
   resolveStory,
   parseInstagramUrl,
   shortcodeToMediaId,
+  sessionManager,
   // exported for tests
   normalizeGraphMedia,
   normalizeApiItem,

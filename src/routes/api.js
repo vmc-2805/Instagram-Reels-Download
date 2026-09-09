@@ -4,7 +4,7 @@ const express = require('express');
 const config = require('../config');
 const { request, baseHeaders } = require('../lib/http');
 const { createRateLimiter } = require('../lib/ratelimit');
-const { resolve, ResolveError } = require('../lib/instagram');
+const { resolve, ResolveError, sessionManager } = require('../lib/instagram');
 const audio = require('../lib/audio');
 const { sendTelegramAlert } = require('../lib/telegram');
 
@@ -222,7 +222,12 @@ router.get('/thumb', async (req, res) => {
 
 /* GET /api/health — liveness probe. */
 router.get('/health', (req, res) => {
-  res.json({ ok: true, uptime: Math.round(process.uptime()), session: Boolean(config.sessionId) });
+  res.json({
+    ok: true,
+    uptime: Math.round(process.uptime()),
+    session: Boolean(config.sessionId || sessionManager.hasSessions()),
+    sessionPool: sessionManager.getStatus(),
+  });
 });
 
 module.exports = router;

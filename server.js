@@ -147,5 +147,6 @@ app.use((error, req, res, next) => {
 
 app.listen(config.port, () => {
   console.log(`\n  ${config.siteName} running at http://localhost:${config.port}`);
-  console.log(`  Instagram session cookie: ${config.sessionId ? 'configured' : 'not set (stories disabled)'}\n`);
+  const sessionCount = config.sessions?.length || (config.sessionId ? 1 : 0);
+  console.log(`  Instagram session pool: ${sessionCount > 0 ? `${sessionCount} session(s) active` : 'not set (anonymous mode)'}\n`);
 });
